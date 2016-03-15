@@ -1,0 +1,97 @@
+package com.aiqing.niuniuheardsensor.Utils.api;
+
+import android.content.Context;
+import android.telephony.TelephonyManager;
+import android.util.Log;
+
+import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.apache.http.Header;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by blue on 16/3/15.
+ */
+public class HSApiHelper {
+    private static final String TAG = "HS UPLOAD";
+
+    static public void requestReleaseRecord(final List<HSRecord> records, Context context, final CallBack callBack) {
+        HSRequestParams params = new HSRequestParams();
+
+
+        List<Map<String, String>> maps = new ArrayList<>();
+        for (HSRecord record : records) {
+            Map<String, String> map = new HashMap<>();
+            if (record.getType() == 1 || record.getType() == 3) {
+                map.put("call_type", "in");
+            } else if (record.getType() == 2) {
+                map.put("call_type", "out");
+            }
+
+            map.put("mobile", record.getNumber() + "");
+
+            map.put("duration", record.getType() == 3 ? "0" : String.valueOf(record.getDuration()));
+
+            SimpleDateFormat sfd = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            String time = sfd.format(record.getDate());
+            map.put("started_at", time);
+
+            maps.add(map);
+        }
+
+        params.put("issue_phones", maps);
+
+        TelephonyManager phoneMgr = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        params.put("customer_service_mobile", "15802162343");
+
+
+//        try {
+//            params.put("file", new File(HSRecordHelper.currentFilePath));
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+
+
+        Log.i(TAG, "issue_phones:" + maps + " customer_service_mobile:15802162343");
+
+
+        HSHttpClient.instance().post(HSHttpClient.API_ISSUE_PHONES, params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+
+                Log.i(TAG, response.toString());
+
+                if (callBack != null)
+                    callBack.onSuccess();
+
+            }
+
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                Log.i(TAG, responseString);
+                if (callBack != null)
+                    callBack.onFailure();
+            }
+        });
+
+
+    }
+
+
+    static public interface CallBack {
+        public void onSuccess();
+
+        public void onFailure();
+    }
+
+}

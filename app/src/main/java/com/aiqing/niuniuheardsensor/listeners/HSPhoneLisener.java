@@ -8,8 +8,6 @@ import com.aiqing.niuniuheardsensor.Utils.HSRecordsUploadHelper;
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Created by blue on 16/3/11.
@@ -22,15 +20,17 @@ public class HSPhoneLisener extends PhoneStateListener {
     boolean isCalling;
     //控制循环是否结束
     boolean isFinish;
-    private ExecutorService service;
+//    private ExecutorService service;
 
     private CallBack callBack;
+    private boolean needCheck;
 
 
-    public HSPhoneLisener(Context context, CallBack callBack) {
+    public HSPhoneLisener(Context context, CallBack callBack, boolean needCheck) {
         this.context = context;
         this.callBack = callBack;
-        service = Executors.newSingleThreadExecutor();
+        this.needCheck = needCheck;
+//        service = Executors.newSingleThreadExecutor();
     }
 
     @Override
@@ -41,10 +41,13 @@ public class HSPhoneLisener extends PhoneStateListener {
                 if (isCalling) {
                     isCalling = false;
                     isFinish = true;
-                    service.shutdown();
+//                    service.shutdown();
                     time = 0;
+                    List<HSRecord> records = null;
+                    if (needCheck) {
+                        records = HSRecordsUploadHelper.checkNeedUpload(context);
+                    }
 
-                    List<HSRecord> records = HSRecordsUploadHelper.checkNeedUpload(context);
                     if (callBack != null) {
                         callBack.onIDLE(records);
                     }
@@ -53,19 +56,19 @@ public class HSPhoneLisener extends PhoneStateListener {
 
             case TelephonyManager.CALL_STATE_OFFHOOK:
                 isCalling = true;
-                service.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        while (!isFinish) {
-                            try {
-                                Thread.sleep(1000);
-                                time++;
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                });
+//                service.execute(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        while (!isFinish) {
+//                            try {
+//                                Thread.sleep(1000);
+//                                time++;
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                    }
+//                });
                 if (callBack != null) {
                     callBack.onOffHook();
                 }
@@ -73,9 +76,9 @@ public class HSPhoneLisener extends PhoneStateListener {
             case TelephonyManager.CALL_STATE_RINGING:
                 isFinish = false;
                 isCalling = true;
-                if (service.isShutdown()) {
-                    service = Executors.newSingleThreadExecutor();
-                }
+//                if (service.isShutdown()) {
+//                    service = Executors.newSingleThreadExecutor();
+//                }
                 if (callBack != null) {
                     callBack.onRinging(incomingNumber);
                 }
