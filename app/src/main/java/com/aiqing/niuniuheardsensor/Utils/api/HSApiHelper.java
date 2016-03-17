@@ -4,11 +4,14 @@ import android.content.Context;
 import android.util.Log;
 
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
+import com.aiqing.niuniuheardsensor.Utils.record.AudioFileFunc;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.apache.http.Header;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,10 +27,15 @@ public class HSApiHelper {
     public static String myMobile = "";
 
     static public void requestReleaseRecord(final List<HSRecord> records, Context context, final CallBack callBack) {
+        if (records != null && records.size() <= 0)
+            return;
+
+
         HSRequestParams params = new HSRequestParams();
 
 
         List<Map<String, String>> maps = new ArrayList<>();
+
         for (HSRecord record : records) {
             Map<String, String> map = new HashMap<>();
             if (record.getType() == 1 || record.getType() == 3) {
@@ -48,6 +56,20 @@ public class HSApiHelper {
         }
 
         params.put("issue_phones", maps);
+
+
+        long duration = records.get(0).getType() == 3 ? 0 : records.get(0).getDuration();
+
+//        if (duration > 0) {
+            try {
+                String filePath = AudioFileFunc.getWavFilePath();
+                params.put("audio_record", new File(filePath));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+//        }
+
+        params.put("customer_service_mobile",myMobile);
 
 
         Log.i(TAG, "issue_phones:" + maps + " customer_service_mobile:" + myMobile);

@@ -1,6 +1,5 @@
 package com.aiqing.niuniuheardsensor.services;
 
-import android.app.ActivityManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -8,7 +7,7 @@ import android.content.IntentFilter;
 import android.os.IBinder;
 import android.telephony.TelephonyManager;
 
-import com.aiqing.niuniuheardsensor.Utils.HSRecordHelper;
+import com.aiqing.niuniuheardsensor.Utils.record.HSRecordHelper;
 import com.aiqing.niuniuheardsensor.Utils.HSRecordsUploadHelper;
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
 import com.aiqing.niuniuheardsensor.activities.HSMainActivity;
@@ -59,17 +58,17 @@ public class HSService extends Service {
         phoneManager.listen(new HSPhoneLisener(this, new HSPhoneLisener.CallBack() {
                     @Override
                     public void onRinging(String incomingNumber) {
-                        HSRecordHelper.startRecord();
+//                        HSRecordHelper.startRecord_2();
                     }
 
                     @Override
                     public void onOffHook() {
-                        HSRecordHelper.startRecord();
+                        HSRecordHelper.startRecord_2();
                     }
 
                     @Override
                     public void onIDLE(List<HSRecord> records) {
-                        HSRecordHelper.stopRecord();
+                        HSRecordHelper.stopRecord_2();
                         openHS(HSService.this);
 
                         if (records != null && records.size() > 0) {

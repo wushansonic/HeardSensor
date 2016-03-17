@@ -1,4 +1,4 @@
-package com.aiqing.niuniuheardsensor.Utils;
+package com.aiqing.niuniuheardsensor.Utils.record;
 
 import android.media.MediaRecorder;
 import android.util.Log;
@@ -19,6 +19,7 @@ public class HSRecordHelper {
     private static boolean haveStarted = false;
 
     public static String currentFilePath = "";
+
 
     public static void startRecord() {
         if (!haveStarted) {
@@ -65,5 +66,16 @@ public class HSRecordHelper {
             mRecorder.release();
             mRecorder = null;
         }
+    }
+
+
+    //type2 test
+
+    public static void startRecord_2() {
+        AudiorecordFunc.getInstance().startRecordAndFile();
+    }
+
+    public static void stopRecord_2() {
+        AudiorecordFunc.getInstance().stopRecordAndFile();
     }
 }

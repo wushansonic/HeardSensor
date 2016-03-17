@@ -6,9 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.aiqing.niuniuheardsensor.HSApplication;
-import com.aiqing.niuniuheardsensor.Utils.HSRecordHelper;
-import com.aiqing.niuniuheardsensor.Utils.api.HSApiHelper;
+import com.aiqing.niuniuheardsensor.Utils.record.HSRecordHelper;
 import com.aiqing.niuniuheardsensor.activities.HSMainActivity;
 
 import java.util.List;
@@ -76,11 +74,11 @@ public class HSPhoneStatusReceiver extends BroadcastReceiver {
         }
 
         if (phoneState.equals(ForeGroundCallState.ACTIVE)) {
-            HSRecordHelper.startRecord();
+            HSRecordHelper.startRecord_2();
         }
 
         if (phoneState.equals(ForeGroundCallState.DISCONNECTED)) {
-            HSRecordHelper.stopRecord();
+            HSRecordHelper.stopRecord_2();
 
             openHS(context);
         }

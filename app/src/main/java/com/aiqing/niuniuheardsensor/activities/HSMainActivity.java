@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.aiqing.niuniuheardsensor.HSApplication;
@@ -14,15 +15,22 @@ import com.aiqing.niuniuheardsensor.Utils.InputUtil;
 import com.aiqing.niuniuheardsensor.Utils.SPAppInner;
 import com.aiqing.niuniuheardsensor.Utils.api.HSApiHelper;
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
+import com.aiqing.niuniuheardsensor.Utils.db.dao.HSRecordsDaos;
+import com.aiqing.niuniuheardsensor.adapters.HSRecordsAdapter;
 import com.aiqing.niuniuheardsensor.services.HSService;
 import com.aiqing.niuniuheardsensor.widgets.SweetAlertDialog;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class HSMainActivity extends HSBaseActivity implements View.OnClickListener {
     private TextView phone_status;
     private TextView change_mobile;
+    private ListView record_list;
+    private HSRecordsAdapter recordsAdapter;
+
+    private List<HSRecord> records = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +77,14 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
         phone_status = (TextView) findViewById(R.id.phone_status);
         change_mobile = (TextView) findViewById(R.id.change_mobile);
         change_mobile.setOnClickListener(this);
+
+        List<HSRecord> recordsDB = HSRecordsDaos.getInstance(this).getAllRecords();
+        if (recordsDB != null && recordsDB.size() > 0)
+            records.addAll(recordsDB);
+        record_list = (ListView) findViewById(R.id.record_list);
+        recordsAdapter = new HSRecordsAdapter(records, this);
+        record_list.setAdapter(recordsAdapter);
+        recordsAdapter.notifyDataSetChanged();
     }
 
     private void showMoblieInputDialog() {
