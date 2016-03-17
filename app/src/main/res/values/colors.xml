@@ -5,4 +5,32 @@
     <color name="colorPrimaryDark">#F57C00</color>
     <color name="colorAccent">#ff8500</color>
 
+    <color name="float_transparent">#66000000</color>
+    <color name="success_stroke_color">#A5DC86</color>
+
+    <color name="red_btn_bg_color">#DD6B55</color>
+    <color name="red_btn_bg_pressed_color">#CD5B55</color>
+    <color name="trans_success_stroke_color">#33A5DC86</color>
+    <color name="warning_stroke_color">#F8BB86</color>
+
+    <color name="colorGray0">#030303</color>
+    <!-- 灰色1 -->
+    <color name="colorGray1">#3b3b3b</color>
+    <!-- 灰色2 -->
+    <color name="colorGray2">#848484</color>
+    <!-- 灰色3 -->
+    <color name="colorGray3">#ababab</color>
+    <!-- 灰色4 -->
+    <color name="colorGray4">#d4d4d4</color>
+    <!-- 灰色5 -->
+    <color name="colorGray5">#f0f0f0</color>
+    <!-- 灰色6 -->
+    <color name="colorGray6">#787878</color>
+    <!-- 灰色7 -->
+    <color name="colorGray7">#383838</color>
+    <!-- 灰色8 -->
+    <color name="colorGray8">#F9F8F6</color>
+
+    <color name="colorOrange1">#ff8500</color>
+
 </resources>

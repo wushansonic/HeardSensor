@@ -1,7 +1,6 @@
 package com.aiqing.niuniuheardsensor.Utils.api;
 
 import android.content.Context;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
@@ -21,6 +20,8 @@ import java.util.Map;
  */
 public class HSApiHelper {
     private static final String TAG = "HS UPLOAD";
+
+    public static String myMobile = "";
 
     static public void requestReleaseRecord(final List<HSRecord> records, Context context, final CallBack callBack) {
         HSRequestParams params = new HSRequestParams();
@@ -48,18 +49,8 @@ public class HSApiHelper {
 
         params.put("issue_phones", maps);
 
-        TelephonyManager phoneMgr = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        params.put("customer_service_mobile", "15802162343");
 
-
-//        try {
-//            params.put("file", new File(HSRecordHelper.currentFilePath));
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-
-
-        Log.i(TAG, "issue_phones:" + maps + " customer_service_mobile:15802162343");
+        Log.i(TAG, "issue_phones:" + maps + " customer_service_mobile:" + myMobile);
 
 
         HSHttpClient.instance().post(HSHttpClient.API_ISSUE_PHONES, params, new JsonHttpResponseHandler() {
