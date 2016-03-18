@@ -48,7 +48,7 @@ public class HSApiHelper {
 
             map.put("duration", record.getType() == 3 ? "0" : String.valueOf(record.getDuration()));
 
-            SimpleDateFormat sfd = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            SimpleDateFormat sfd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String time = sfd.format(record.getDate());
             map.put("started_at", time);
 
@@ -60,16 +60,16 @@ public class HSApiHelper {
 
         long duration = records.get(0).getType() == 3 ? 0 : records.get(0).getDuration();
 
-//        if (duration > 0) {
+        if (duration > 0) {
             try {
                 String filePath = AudioFileFunc.getWavFilePath();
                 params.put("audio_record", new File(filePath));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-//        }
+        }
 
-        params.put("customer_service_mobile",myMobile);
+        params.put("customer_service_mobile", myMobile);
 
 
         Log.i(TAG, "issue_phones:" + maps + " customer_service_mobile:" + myMobile);

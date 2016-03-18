@@ -4,16 +4,32 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF"
     android:orientation="vertical"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
+
     tools:context="com.aiqing.niuniuheardsensor.activities.HSMainActivity">
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="牛牛客服"
+            android:textSize="28sp"
+            android:textColor="@color/colorOrange1"/>
+    </FrameLayout>
+
+
     <LinearLayout
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="@color/colorGray5">
 
         <TextView
             android:id="@+id/phone_status"
@@ -35,8 +51,10 @@
 
 
     <ListView
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:id="@+id/record_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"></ListView>
+        android:layout_height="match_parent"></ListView>
 
 </LinearLayout>

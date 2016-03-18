@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
 import com.aiqing.niuniuheardsensor.Utils.db.dao.HSRecordsDaos;
+import com.aiqing.niuniuheardsensor.Utils.record.AudioFileFunc;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class HSRecordsUploadHelper {
             long duration = cursor.getLong(cursor.getColumnIndex(CallLog.Calls.DURATION));
             long number = cursor.getLong(cursor.getColumnIndex(CallLog.Calls.NUMBER));
 
-            SimpleDateFormat sfd = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            SimpleDateFormat sfd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date date = new Date(Long.parseLong(cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.DATE))));
             String time = sfd.format(date);
             hasRecord = cursor.moveToNext();
@@ -48,20 +49,23 @@ public class HSRecordsUploadHelper {
             List<HSRecord> records = HSRecordsDaos.getInstance(context).getAllRecords();
 
             if (records == null && records.size() <= 0) {
-                HSRecordsDaos.getInstance(context).addOneRecord(new HSRecord(date, type, number, duration));
+                HSRecordsDaos.getInstance(context).addOneRecord(new HSRecord(date, type, number, duration, "", false));
                 break;
             } else {
                 HSRecord latestRecord = records.get(records.size() - 1);
                 if (date.after(latestRecord.getDate())) {
                     Log.i(TAG, "type:" + type + " duration:" + duration + " number:" + number + " time:" + time);
-                    HSRecord record = new HSRecord(date, type, number,duration);
+                    String filePath = "";
+                    if (duration > 0 && type != 3) {
+                        filePath = AudioFileFunc.getWavFilePath();
+                    }
+                    HSRecord record = new HSRecord(date, type, number, duration, filePath, false);
                     HSRecordsDaos.getInstance(context).addOneRecord(record);
                     resultRecords.add(record);
                 } else {
                     break;
                 }
             }
-
 
 
         }

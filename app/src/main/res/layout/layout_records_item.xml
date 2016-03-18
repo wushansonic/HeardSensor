@@ -3,7 +3,9 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="5dp">
+    android:gravity="center_vertical"
+    android:paddingBottom="5dp"
+    android:paddingTop="5dp">
 
 
     <TextView
@@ -55,7 +57,15 @@
     <View
         android:layout_width="1px"
         android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         android:layout_height="match_parent"
         android:background="@color/colorGray3"/>
+
+    <ImageView
+        android:id="@+id/play_record"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@drawable/icon_play"
+        android:visibility="gone"/>
 
 </LinearLayout>

@@ -21,15 +21,22 @@ public class HSRecord {
     Long number;
     @DatabaseField(columnName = "duration")
     Long duration;
+    @DatabaseField(columnName = "file_path")
+    String file_path;
+    @DatabaseField(columnName = "play_state")
+    boolean play_state;
+
 
     public HSRecord() {
     }
 
-    public HSRecord(Date date, Integer type, Long number, Long duration) {
+    public HSRecord(Date date, Integer type, Long number, Long duration, String filePath, boolean play_state) {
         this.date = date;
         this.type = type;
         this.number = number;
         this.duration = duration;
+        this.file_path = filePath;
+        this.play_state = play_state;
     }
 
     public Integer getId() {
@@ -70,5 +77,21 @@ public class HSRecord {
 
     public void setDuration(Long duration) {
         this.duration = duration;
+    }
+
+    public String getFile_path() {
+        return file_path;
+    }
+
+    public void setFile_path(String file_path) {
+        this.file_path = file_path;
+    }
+
+    public boolean isPlay_state() {
+        return play_state;
+    }
+
+    public void setPlay_state(boolean play_state) {
+        this.play_state = play_state;
     }
 }

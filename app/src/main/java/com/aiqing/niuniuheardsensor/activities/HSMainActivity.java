@@ -2,7 +2,10 @@ package com.aiqing.niuniuheardsensor.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -32,9 +35,23 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
 
     private List<HSRecord> records = new ArrayList<>();
 
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            if (msg.what == 1) {
+                checkAndUploadRecords();
+            }
+        }
+    };
+    private boolean goOn = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i("HS U", "onCreate");
+
         setContentView(R.layout.activity_hsmain);
 
         initViews();
@@ -46,30 +63,83 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
         else {
             phone_status.setText("我的号码：" + myMobile);
             HSApiHelper.myMobile = myMobile;
-            startSensor();
+            checkAndUploadRecords();
+
+            startCheckThread();
         }
 
     }
 
-    private void startSensor() {
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.i("HS U", "onNewIntent");
+
+        String myMobile = HSApplication.asp.read(SPAppInner.MOBILE, "");
+        if (TextUtils.isEmpty(myMobile))
+            showMoblieInputDialog();
+        else {
+            phone_status.setText("我的号码：" + myMobile);
+            HSApiHelper.myMobile = myMobile;
+            checkAndUploadRecords();
+        }
+
+        List<HSRecord> recordsDB = HSRecordsDaos.getInstance(this).getAllRecords();
+        if (recordsDB != null && recordsDB.size() > 0) {
+            records.clear();
+            records.addAll(recordsDB);
+        }
+        recordsAdapter.notifyDataSetChanged();
+    }
+
+    private void checkAndUploadRecords() {
         startService(new Intent(this, HSService.class));
 
-        List<HSRecord> records = HSRecordsUploadHelper.checkNeedUpload(this);
-        if (records != null && records.size() > 0) {
-            HSApiHelper.requestReleaseRecord(records, this, new HSApiHelper.CallBack() {
+        List<HSRecord> records_need_upload = HSRecordsUploadHelper.checkNeedUpload(this);
+
+        Log.i("HS U", "need upload records count:" + (records_need_upload == null ? 0 : records_need_upload.size()));
+
+        if (records_need_upload != null && records_need_upload.size() > 0) {
+
+//            List<HSRecord> recordsDB = HSRecordsDaos.getInstance(this).getAllRecords();
+//            if (recordsDB != null && recordsDB.size() > 0) {
+//                records.clear();
+//                records.addAll(recordsDB);
+//            }
+
+            records.addAll(records_need_upload);
+            recordsAdapter.notifyDataSetChanged();
+
+
+            HSApiHelper.requestReleaseRecord(records_need_upload, this, new HSApiHelper.CallBack() {
                 @Override
                 public void onSuccess() {
-                    finish();
+                    //finish();
                 }
 
                 @Override
                 public void onFailure() {
-                    finish();
+                    //finish();
                 }
             });
         } else {
-//            finish();
+            //   finish();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Log.i("HS U", "onResume");
+
+        List<HSRecord> recordsDB = HSRecordsDaos.getInstance(this).getAllRecords();
+        if (recordsDB != null && recordsDB.size() > 0) {
+            records.clear();
+            records.addAll(recordsDB);
+        }
+        recordsAdapter.notifyDataSetChanged();
+
     }
 
     private void initViews() {
@@ -78,13 +148,10 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
         change_mobile = (TextView) findViewById(R.id.change_mobile);
         change_mobile.setOnClickListener(this);
 
-        List<HSRecord> recordsDB = HSRecordsDaos.getInstance(this).getAllRecords();
-        if (recordsDB != null && recordsDB.size() > 0)
-            records.addAll(recordsDB);
         record_list = (ListView) findViewById(R.id.record_list);
         recordsAdapter = new HSRecordsAdapter(records, this);
         record_list.setAdapter(recordsAdapter);
-        recordsAdapter.notifyDataSetChanged();
+        record_list.setDividerHeight(1);
     }
 
     private void showMoblieInputDialog() {
@@ -99,7 +166,7 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
                     sweetAlertDialog.dismiss();
 
                     phone_status.setText("我的号码：" + mobile);
-                    startSensor();
+                    checkAndUploadRecords();
                 }
             }
         }).show();
@@ -125,5 +192,31 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
                 showMoblieInputDialog();
                 break;
         }
+    }
+
+    private void startCheckThread() {
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+
+
+                while (goOn) {
+                    handler.sendEmptyMessage(1);
+
+                    try {
+                        Thread.sleep(1000 * 5);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }.start();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        goOn = false;
     }
 }

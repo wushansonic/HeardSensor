@@ -1,5 +1,6 @@
 package com.aiqing.niuniuheardsensor.Utils.record;
 
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.util.Log;
 
@@ -19,6 +20,10 @@ public class HSRecordHelper {
     private static boolean haveStarted = false;
 
     public static String currentFilePath = "";
+
+
+    private static MediaPlayer mediaPlayer;
+    private static boolean isPlaying = false;
 
 
     public static void startRecord() {
@@ -72,10 +77,46 @@ public class HSRecordHelper {
     //type2 test
 
     public static void startRecord_2() {
+        File pp = new File(path);
+        if (!pp.isDirectory() && !pp.exists()) {
+            pp.mkdir();
+        }
+
+        String fileName = new SimpleDateFormat(
+                "yyyyMMddHHmmss").format(System
+                .currentTimeMillis())
+                + ".wav";
+        AudioFileFunc.setFileName(fileName);
         AudiorecordFunc.getInstance().startRecordAndFile();
     }
 
     public static void stopRecord_2() {
         AudiorecordFunc.getInstance().stopRecordAndFile();
+    }
+
+
+    public static void play(String filePath) {
+        if (isPlaying)
+            return;
+
+        if (mediaPlayer == null) {
+            mediaPlayer = new MediaPlayer();
+        }
+
+        mediaPlayer.reset();
+        try {
+            mediaPlayer.setDataSource(filePath);
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+            isPlaying = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void stopPlay() {
+        //position = mediaPlayer.getCurrentPosition();
+        mediaPlayer.stop();
+        isPlaying = false;
     }
 }
