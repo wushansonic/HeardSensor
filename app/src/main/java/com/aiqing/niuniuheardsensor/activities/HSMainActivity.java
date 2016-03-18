@@ -86,6 +86,7 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
 
         List<HSRecord> recordsDB = HSRecordsDaos.getInstance(this).getAllRecords();
         if (recordsDB != null && recordsDB.size() > 0) {
+            recordsDB.remove(0);
             records.clear();
             records.addAll(recordsDB);
         }
@@ -135,6 +136,7 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
 
         List<HSRecord> recordsDB = HSRecordsDaos.getInstance(this).getAllRecords();
         if (recordsDB != null && recordsDB.size() > 0) {
+            recordsDB.remove(0);
             records.clear();
             records.addAll(recordsDB);
         }
