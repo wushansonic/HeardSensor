@@ -132,7 +132,6 @@
             android:id="@+id/confirm_button"
             style="@style/dialog_confirm_button"
             android:layout_width="match_parent"
-            android:layout_marginLeft="5dp"
             android:layout_weight="1"
             android:text="确定" />
 
