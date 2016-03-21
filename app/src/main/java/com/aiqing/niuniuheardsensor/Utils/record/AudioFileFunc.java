@@ -21,7 +21,7 @@ public class AudioFileFunc {
     public final static String AUDIO_AMR_FILENAME = "FinalAudio.amr";
 
 
-    private static String fileBasePath = "/sdcard/niuniuqiche/records/";
+    private static String fileBasePath = "/sdcard/heardsensor/";
 
 
     public static void setFileName(String fileName) {

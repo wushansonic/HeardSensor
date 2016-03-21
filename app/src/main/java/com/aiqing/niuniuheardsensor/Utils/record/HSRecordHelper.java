@@ -15,7 +15,8 @@ public class HSRecordHelper {
     private static final String TAG = "AudioRecordTest";
     //语音操作对象
     private static MediaRecorder mRecorder = null;
-    private static String path = "/sdcard/niuniuqiche/records/";
+
+    private static String path = "/sdcard/heardsensor/";
 
     private static boolean haveStarted = false;
 
