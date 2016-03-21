@@ -168,7 +168,8 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
                     sweetAlertDialog.dismiss();
 
                     phone_status.setText("我的号码：" + mobile);
-                    checkAndUploadRecords();
+
+                    startCheckThread();
                 }
             }
         }).show();
