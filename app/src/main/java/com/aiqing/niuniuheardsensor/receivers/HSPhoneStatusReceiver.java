@@ -71,11 +71,11 @@ public class HSPhoneStatusReceiver extends BroadcastReceiver {
         }
 
         if (phoneState.equals(ForeGroundCallState.ACTIVE)) {
-            HSRecordHelper.startRecord_2();
+            HSRecordHelper.startRecord_3();
         }
 
         if (phoneState.equals(ForeGroundCallState.DISCONNECTED)) {
-            HSRecordHelper.stopRecord_2();
+            HSRecordHelper.stopRecord_3();
 
             openHS(context);
         }

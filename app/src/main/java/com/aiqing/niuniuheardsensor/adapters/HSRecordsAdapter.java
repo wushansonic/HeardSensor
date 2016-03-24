@@ -60,7 +60,7 @@ public class HSRecordsAdapter extends BaseAdapter {
         TextView tv_duration = (TextView) convertView.findViewById(R.id.duration);
 
 
-        SimpleDateFormat sfd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sfd = new SimpleDateFormat("MM-dd HH:mm:ss");
         String time = sfd.format(record.getDate());
 
         String type = "";

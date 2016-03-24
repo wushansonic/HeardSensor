@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
 import com.aiqing.niuniuheardsensor.Utils.db.dao.HSRecordsDaos;
-import com.aiqing.niuniuheardsensor.Utils.record.AudioFileFunc;
+import com.zc.RecordDemo.MyAudioRecorder;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,8 +48,8 @@ public class HSRecordsUploadHelper {
 
             List<HSRecord> records = HSRecordsDaos.getInstance(context).getAllRecords();
 
-            if (records == null && records.size() <= 0) {
-                HSRecordsDaos.getInstance(context).addOneRecord(new HSRecord(date, type, number, duration, "", false));
+            if (records == null || records.size() <= 0) {
+                HSRecordsDaos.getInstance(context).addOneRecord(new HSRecord(date, type, number, duration, "", false, ""));
                 break;
             } else {
                 HSRecord latestRecord = records.get(records.size() - 1);
@@ -57,9 +57,9 @@ public class HSRecordsUploadHelper {
                     Log.i(TAG, "type:" + type + " duration:" + duration + " number:" + number + " time:" + time);
                     String filePath = "";
                     if (duration > 0 && type != 3) {
-                        filePath = AudioFileFunc.getWavFilePath();
+                        filePath = MyAudioRecorder.getAudioMp3Filename();
                     }
-                    HSRecord record = new HSRecord(date, type, number, duration, filePath, false);
+                    HSRecord record = new HSRecord(date, type, number, duration, filePath, false, "");
                     HSRecordsDaos.getInstance(context).addOneRecord(record);
                     resultRecords.add(record);
                 } else {

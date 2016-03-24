@@ -31,6 +31,7 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
     private TextView phone_status;
     private TextView change_mobile;
     private ListView record_list;
+
     private HSRecordsAdapter recordsAdapter;
 
     private List<HSRecord> records = new ArrayList<>();
@@ -98,6 +99,9 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
 
         List<HSRecord> records_need_upload = HSRecordsUploadHelper.checkNeedUpload(this);
 
+
+        final HSRecord record = (records_need_upload != null && records_need_upload.size() > 0) ? records_need_upload.get(0) : null;
+
         Log.i("HS U", "need upload records count:" + (records_need_upload == null ? 0 : records_need_upload.size()));
 
         if (records_need_upload != null && records_need_upload.size() > 0) {
@@ -108,14 +112,24 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
 //                records.addAll(recordsDB);
 //            }
 
+
             records.addAll(records_need_upload);
             recordsAdapter.notifyDataSetChanged();
 
 
             HSApiHelper.requestReleaseRecord(records_need_upload, this, new HSApiHelper.CallBack() {
                 @Override
-                public void onSuccess() {
+                public void onSuccess(boolean needReupload, String id) {
                     //finish();
+
+                    if (needReupload) {
+                        if (record != null) {
+                            record.setReupload_id(id);
+                            HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(record);
+                            recordsAdapter.notifyDataSetChanged();
+                        }
+
+                    }
                 }
 
                 @Override
@@ -143,6 +157,9 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
         recordsAdapter.notifyDataSetChanged();
 
     }
+
+
+    private boolean isRecording = false;
 
     private void initViews() {
 

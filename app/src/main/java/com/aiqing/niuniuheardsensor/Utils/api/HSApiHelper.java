@@ -4,8 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
-import com.aiqing.niuniuheardsensor.Utils.record.AudioFileFunc;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.zc.RecordDemo.MyAudioRecorder;
 
 import org.apache.http.Header;
 import org.json.JSONObject;
@@ -62,7 +62,7 @@ public class HSApiHelper {
 
         if (duration > 0) {
             try {
-                String filePath = AudioFileFunc.getWavFilePath();
+                String filePath = MyAudioRecorder.getAudioMp3Filename();
                 params.put("audio_record", new File(filePath));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -83,7 +83,7 @@ public class HSApiHelper {
                 Log.i(TAG, response.toString());
 
                 if (callBack != null)
-                    callBack.onSuccess();
+                    callBack.onSuccess(false, "");
 
             }
 
@@ -102,7 +102,7 @@ public class HSApiHelper {
 
 
     static public interface CallBack {
-        public void onSuccess();
+        public void onSuccess(boolean needReupload, String id);
 
         public void onFailure();
     }

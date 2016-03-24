@@ -16,20 +16,20 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="牛牛客服"
-            android:textSize="28sp"
-            android:textColor="@color/colorOrange1"/>
+            android:textColor="@color/colorOrange1"
+            android:textSize="28sp" />
     </FrameLayout>
 
 
     <LinearLayout
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorGray5"
         android:orientation="horizontal"
-        android:background="@color/colorGray5">
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp">
 
         <TextView
             android:id="@+id/phone_status"
@@ -45,16 +45,13 @@
             android:text="修改"
             android:textColor="@color/colorOrange1"
             android:textSize="20sp" />
-
-
     </LinearLayout>
 
-
     <ListView
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
         android:id="@+id/record_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></ListView>
+        android:layout_height="match_parent"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"></ListView>
 
 </LinearLayout>

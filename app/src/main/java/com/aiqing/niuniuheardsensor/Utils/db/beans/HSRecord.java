@@ -25,18 +25,21 @@ public class HSRecord {
     String file_path;
     @DatabaseField(columnName = "play_state")
     boolean play_state;
+    @DatabaseField(columnName = "reupload_id")
+    String reupload_id;
 
 
     public HSRecord() {
     }
 
-    public HSRecord(Date date, Integer type, Long number, Long duration, String filePath, boolean play_state) {
+    public HSRecord(Date date, Integer type, Long number, Long duration, String filePath, boolean play_state, String reupload_id) {
         this.date = date;
         this.type = type;
         this.number = number;
         this.duration = duration;
         this.file_path = filePath;
         this.play_state = play_state;
+        this.reupload_id = reupload_id;
     }
 
     public Integer getId() {
@@ -93,5 +96,13 @@ public class HSRecord {
 
     public void setPlay_state(boolean play_state) {
         this.play_state = play_state;
+    }
+
+    public String getReupload_id() {
+        return reupload_id;
+    }
+
+    public void setReupload_id(String reupload_id) {
+        this.reupload_id = reupload_id;
     }
 }

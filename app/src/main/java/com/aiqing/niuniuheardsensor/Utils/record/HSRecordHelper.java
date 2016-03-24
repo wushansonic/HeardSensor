@@ -4,6 +4,8 @@ import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.util.Log;
 
+import com.zc.RecordDemo.MyAudioRecorder;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -25,6 +27,8 @@ public class HSRecordHelper {
 
     private static MediaPlayer mediaPlayer;
     private static boolean isPlaying = false;
+
+    private static MyAudioRecorder recorder;
 
 
     public static void startRecord() {
@@ -93,6 +97,31 @@ public class HSRecordHelper {
 
     public static void stopRecord_2() {
         AudiorecordFunc.getInstance().stopRecordAndFile();
+    }
+
+    public static void startRecord_3() {
+        if (recorder == null) {
+            recorder = new MyAudioRecorder();
+            recorder.prepare();
+        }
+
+
+        File pp = new File(path);
+        if (!pp.isDirectory() && !pp.exists()) {
+            pp.mkdir();
+        }
+
+        String fileName_mp3 = new SimpleDateFormat(
+                "yyyyMMddHHmmss").format(System
+                .currentTimeMillis())
+                + ".mp3";
+
+        recorder.setFileName_mp3(fileName_mp3);
+        recorder.startRecording();
+    }
+
+    public static void stopRecord_3() {
+        recorder.stopRecording();
     }
 
 
