@@ -1,11 +1,12 @@
 package com.aiqing.niuniuheardsensor.Utils.api;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
-import com.aiqing.niuniuheardsensor.Utils.record.AudioFileFunc;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.zc.RecordDemo.MyAudioRecorder;
 
 import org.apache.http.Header;
 import org.json.JSONObject;
@@ -46,6 +47,9 @@ public class HSApiHelper {
 
             map.put("mobile", record.getNumber() + "");
 
+            if (!TextUtils.isEmpty(record.getReupload_id()))
+                map.put("id", record.getReupload_id());
+
             map.put("duration", record.getType() == 3 ? "0" : String.valueOf(record.getDuration()));
 
             SimpleDateFormat sfd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -62,7 +66,7 @@ public class HSApiHelper {
 
         if (duration > 0) {
             try {
-                String filePath = AudioFileFunc.getWavFilePath();
+                String filePath = MyAudioRecorder.getAudioMp3Filename();
                 params.put("audio_record", new File(filePath));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -83,7 +87,7 @@ public class HSApiHelper {
                 Log.i(TAG, response.toString());
 
                 if (callBack != null)
-                    callBack.onSuccess();
+                    callBack.onSuccess(response);
 
             }
 
@@ -102,7 +106,7 @@ public class HSApiHelper {
 
 
     static public interface CallBack {
-        public void onSuccess();
+        public void onSuccess(JSONObject response);
 
         public void onFailure();
     }

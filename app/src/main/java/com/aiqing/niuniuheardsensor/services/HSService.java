@@ -7,9 +7,9 @@ import android.content.IntentFilter;
 import android.os.IBinder;
 import android.telephony.TelephonyManager;
 
-import com.aiqing.niuniuheardsensor.Utils.record.HSRecordHelper;
 import com.aiqing.niuniuheardsensor.Utils.HSRecordsUploadHelper;
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
+import com.aiqing.niuniuheardsensor.Utils.record.HSRecordHelper;
 import com.aiqing.niuniuheardsensor.activities.HSMainActivity;
 import com.aiqing.niuniuheardsensor.listeners.HSPhoneLisener;
 import com.aiqing.niuniuheardsensor.receivers.HSPhoneStatusReceiver;
@@ -63,12 +63,12 @@ public class HSService extends Service {
 
                     @Override
                     public void onOffHook() {
-                        HSRecordHelper.startRecord_2();
+                        HSRecordHelper.startRecord_3();
                     }
 
                     @Override
                     public void onIDLE(List<HSRecord> records) {
-                        HSRecordHelper.stopRecord_2();
+                        HSRecordHelper.stopRecord_3();
                         openHS(HSService.this);
 
                         if (records != null && records.size() > 0) {

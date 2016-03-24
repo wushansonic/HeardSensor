@@ -33,7 +33,6 @@
             </intent-filter>
         </activity>
 
-
         <receiver
             android:name="com.aiqing.niuniuheardsensor.receivers.HSBootBroadcastReceiver"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">

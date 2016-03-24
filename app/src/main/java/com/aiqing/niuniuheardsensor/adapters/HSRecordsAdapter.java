@@ -11,8 +11,11 @@ import android.widget.TextView;
 
 import com.aiqing.niuniuheardsensor.R;
 import com.aiqing.niuniuheardsensor.Utils.HSRecordsUploadHelper;
+import com.aiqing.niuniuheardsensor.Utils.api.HSApiHelper;
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
 import com.aiqing.niuniuheardsensor.Utils.record.HSRecordHelper;
+
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,6 +27,7 @@ import java.util.List;
 public class HSRecordsAdapter extends BaseAdapter {
     private List<HSRecord> recordList = new ArrayList<>();
     private Context context;
+    private boolean showSelect = false;
 
 
     public HSRecordsAdapter(List<HSRecord> recordList, Context context) {
@@ -60,7 +64,7 @@ public class HSRecordsAdapter extends BaseAdapter {
         TextView tv_duration = (TextView) convertView.findViewById(R.id.duration);
 
 
-        SimpleDateFormat sfd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sfd = new SimpleDateFormat("MM-dd HH:mm:ss");
         String time = sfd.format(record.getDate());
 
         String type = "";
@@ -108,12 +112,17 @@ public class HSRecordsAdapter extends BaseAdapter {
             play_record.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+
                     boolean isPlaying = record.isPlay_state();
                     if (isPlaying) {
                         HSRecordHelper.stopPlay();
                         ((ImageView) v).setImageResource(R.drawable.icon_play);
                         record.setPlay_state(false);
                     } else {
+                        if (HSRecordHelper.isPlaying)
+                            return;
+
                         HSRecordHelper.play(record.getFile_path());
                         ((ImageView) v).setImageResource(R.drawable.icon_pause);
                         record.setPlay_state(true);
@@ -126,7 +135,63 @@ public class HSRecordsAdapter extends BaseAdapter {
             play_record.setVisibility(View.GONE);
         }
 
+        final TextView reupload = (TextView) convertView.findViewById(R.id.reupload);
+        if (TextUtils.isEmpty(record.getReupload_id())) {
+            reupload.setVisibility(View.GONE);
+        } else {
+            reupload.setVisibility(View.VISIBLE);
+
+            reupload.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    List<HSRecord> records = new ArrayList<HSRecord>();
+                    records.add(record);
+                    reupload.setText("正在重传...");
+                    HSApiHelper.requestReleaseRecord(records, context, new HSApiHelper.CallBack() {
+                        @Override
+                        public void onSuccess(JSONObject response) {
+                            int status = response.optInt("status");
+                            if (status == 201) {
+                                reupload.setText("重传");
+                            } else {
+                                reupload.setVisibility(View.GONE);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure() {
+
+                        }
+                    });
+                }
+            });
+        }
+
+        final ImageView select = (ImageView) convertView.findViewById(R.id.select);
+        if (showSelect) {
+            select.setBackgroundResource(record.select ? R.drawable.btn_selected : R.drawable.btn_unselect);
+            select.setVisibility(View.VISIBLE);
+            select.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (record.select) {
+                        record.select = false;
+                        select.setBackgroundResource(R.drawable.btn_unselect);
+                    } else {
+                        record.select = true;
+                        select.setBackgroundResource(R.drawable.btn_selected);
+                    }
+                }
+            });
+        } else {
+            select.setVisibility(View.GONE);
+        }
+
 
         return convertView;
+    }
+
+    public void setShowSelect(boolean showSelect) {
+        this.showSelect = showSelect;
     }
 }

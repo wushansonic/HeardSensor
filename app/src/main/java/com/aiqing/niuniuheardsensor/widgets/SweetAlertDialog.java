@@ -67,6 +67,8 @@ public class SweetAlertDialog extends Dialog implements View.OnClickListener {
 
     private Context mContext;
 
+    private boolean showEdit = true;
+
     public static interface OnSweetClickListener {
         public void onClick(SweetAlertDialog sweetAlertDialog);
     }
@@ -160,8 +162,11 @@ public class SweetAlertDialog extends Dialog implements View.OnClickListener {
 
 
         dialog_mobile_edit = (EditText) findViewById(R.id.dialog_mobile_edit);
-
-
+        if (showEdit) {
+            dialog_mobile_edit.setVisibility(View.VISIBLE);
+        } else {
+            dialog_mobile_edit.setVisibility(View.GONE);
+        }
     }
 
     private void restore() {
@@ -360,5 +365,11 @@ public class SweetAlertDialog extends Dialog implements View.OnClickListener {
 
     public EditText getDialog_mobile_edit() {
         return dialog_mobile_edit;
+    }
+
+
+    public SweetAlertDialog hideEdit(boolean showEdit) {
+        this.showEdit = showEdit;
+        return this;
     }
 }

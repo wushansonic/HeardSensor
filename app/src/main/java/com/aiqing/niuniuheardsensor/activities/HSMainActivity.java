@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -19,9 +20,12 @@ import com.aiqing.niuniuheardsensor.Utils.SPAppInner;
 import com.aiqing.niuniuheardsensor.Utils.api.HSApiHelper;
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
 import com.aiqing.niuniuheardsensor.Utils.db.dao.HSRecordsDaos;
+import com.aiqing.niuniuheardsensor.Utils.record.HSRecordHelper;
 import com.aiqing.niuniuheardsensor.adapters.HSRecordsAdapter;
 import com.aiqing.niuniuheardsensor.services.HSService;
 import com.aiqing.niuniuheardsensor.widgets.SweetAlertDialog;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +35,16 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
     private TextView phone_status;
     private TextView change_mobile;
     private ListView record_list;
+    private TextView edit;
+    private LinearLayout edit_layout;
+    private TextView select_all, delete;
+
     private HSRecordsAdapter recordsAdapter;
 
     private List<HSRecord> records = new ArrayList<>();
+
+    private boolean isEditState = false;
+    private boolean isSelectAll = false;
 
     private Handler handler = new Handler() {
         @Override
@@ -61,7 +72,7 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
         if (TextUtils.isEmpty(myMobile))
             showMoblieInputDialog();
         else {
-            phone_status.setText("我的号码：" + myMobile);
+            phone_status.setText("我的号码:" + myMobile);
             HSApiHelper.myMobile = myMobile;
             checkAndUploadRecords();
 
@@ -96,7 +107,9 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
     private void checkAndUploadRecords() {
         startService(new Intent(this, HSService.class));
 
-        List<HSRecord> records_need_upload = HSRecordsUploadHelper.checkNeedUpload(this);
+        final List<HSRecord> records_need_upload = HSRecordsUploadHelper.checkNeedUpload(this);
+
+        final HSRecord record = (records_need_upload != null && records_need_upload.size() > 0) ? records_need_upload.get(0) : null;
 
         Log.i("HS U", "need upload records count:" + (records_need_upload == null ? 0 : records_need_upload.size()));
 
@@ -108,14 +121,27 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
 //                records.addAll(recordsDB);
 //            }
 
+
             records.addAll(records_need_upload);
             recordsAdapter.notifyDataSetChanged();
 
 
             HSApiHelper.requestReleaseRecord(records_need_upload, this, new HSApiHelper.CallBack() {
                 @Override
-                public void onSuccess() {
+                public void onSuccess(JSONObject response) {
                     //finish();
+
+                    int status = response.optInt("status");
+                    int id = response.optInt("id");
+
+                    if (status == 201) {
+
+                        if (records_need_upload != null && records_need_upload.size() > 0) {
+                            records.get(records.size() - 1).setReupload_id(String.valueOf(id));
+                            HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(records.get(records.size() - 1));
+                            recordsAdapter.notifyDataSetChanged();
+                        }
+                    }
                 }
 
                 @Override
@@ -144,6 +170,9 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
 
     }
 
+
+    private boolean isRecording = false;
+
     private void initViews() {
 
         phone_status = (TextView) findViewById(R.id.phone_status);
@@ -154,6 +183,95 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
         recordsAdapter = new HSRecordsAdapter(records, this);
         record_list.setAdapter(recordsAdapter);
         record_list.setDividerHeight(1);
+
+        edit = (TextView) findViewById(R.id.edit);
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isEditState) {
+                    isEditState = false;
+                    recordsAdapter.setShowSelect(false);
+                    recordsAdapter.notifyDataSetChanged();
+                    edit_layout.setVisibility(View.GONE);
+                    edit.setText("编辑记录");
+                } else {
+                    isEditState = true;
+                    edit_layout.setVisibility(View.VISIBLE);
+                    recordsAdapter.setShowSelect(true);
+                    for (HSRecord record : records) {
+                        record.select = false;
+                    }
+                    recordsAdapter.notifyDataSetChanged();
+                    edit.setText("取消编辑");
+                }
+            }
+        });
+        edit_layout = (LinearLayout) findViewById(R.id.edit_layout);
+
+        select_all = (TextView) findViewById(R.id.select_all);
+        select_all.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (records == null || records.size() <= 0)
+                    return;
+
+                if (!isSelectAll) {
+                    for (HSRecord record : records) {
+                        record.select = true;
+                    }
+                    isSelectAll = true;
+                    select_all.setText("取消");
+                } else {
+                    for (HSRecord record : records) {
+                        record.select = false;
+                    }
+                    isSelectAll = false;
+                    select_all.setText("全选");
+                }
+                recordsAdapter.notifyDataSetChanged();
+            }
+        });
+
+        delete = (TextView) findViewById(R.id.delete);
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (records == null || records.size() <= 0)
+                    return;
+
+
+                new SweetAlertDialog(HSMainActivity.this).showCancelButton(true).hideEdit(false).setTitleText("确定删除记录吗?").setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        sweetAlertDialog.dismiss();
+                    }
+                }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        sweetAlertDialog.dismiss();
+                        List<Integer> ids = new ArrayList<Integer>();
+
+                        for (int i = 0; i < records.size(); i++) {
+                            HSRecord record = records.get(i);
+
+                            if (record.select) {
+                                ids.add(record.getId());
+                                if (!TextUtils.isEmpty(record.getFile_path()))
+                                    HSRecordHelper.deleteRecordFile(record.getFile_path());
+                                records.remove(i--);
+                            }
+                        }
+
+                        if (ids.size() > 0) {
+                            recordsAdapter.notifyDataSetChanged();
+                            HSRecordsDaos.getInstance(HSMainActivity.this).deleteRecordsByIds(ids);
+                        }
+                    }
+                }).show();
+
+
+            }
+        });
     }
 
     private void showMoblieInputDialog() {
