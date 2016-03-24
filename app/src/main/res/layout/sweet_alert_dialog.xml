@@ -126,6 +126,7 @@
             android:layout_weight="1"
             android:background="@drawable/sweet_gray_button_background"
             android:text="取消"
+            android:layout_marginRight="10dp"
             android:visibility="gone" />
 
         <Button

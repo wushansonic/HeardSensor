@@ -15,6 +15,8 @@ import com.aiqing.niuniuheardsensor.Utils.api.HSApiHelper;
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
 import com.aiqing.niuniuheardsensor.Utils.record.HSRecordHelper;
 
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,12 +112,17 @@ public class HSRecordsAdapter extends BaseAdapter {
             play_record.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+
                     boolean isPlaying = record.isPlay_state();
                     if (isPlaying) {
                         HSRecordHelper.stopPlay();
                         ((ImageView) v).setImageResource(R.drawable.icon_play);
                         record.setPlay_state(false);
                     } else {
+                        if (HSRecordHelper.isPlaying)
+                            return;
+
                         HSRecordHelper.play(record.getFile_path());
                         ((ImageView) v).setImageResource(R.drawable.icon_pause);
                         record.setPlay_state(true);
@@ -128,7 +135,7 @@ public class HSRecordsAdapter extends BaseAdapter {
             play_record.setVisibility(View.GONE);
         }
 
-        TextView reupload = (TextView) convertView.findViewById(R.id.reupload);
+        final TextView reupload = (TextView) convertView.findViewById(R.id.reupload);
         if (TextUtils.isEmpty(record.getReupload_id())) {
             reupload.setVisibility(View.GONE);
         } else {
@@ -139,7 +146,23 @@ public class HSRecordsAdapter extends BaseAdapter {
                 public void onClick(View v) {
                     List<HSRecord> records = new ArrayList<HSRecord>();
                     records.add(record);
-                    HSApiHelper.requestReleaseRecord(records, context, null);
+                    reupload.setText("正在重传...");
+                    HSApiHelper.requestReleaseRecord(records, context, new HSApiHelper.CallBack() {
+                        @Override
+                        public void onSuccess(JSONObject response) {
+                            int status = response.optInt("status");
+                            if (status == 201) {
+                                reupload.setText("重传");
+                            } else {
+                                reupload.setVisibility(View.GONE);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure() {
+
+                        }
+                    });
                 }
             });
         }

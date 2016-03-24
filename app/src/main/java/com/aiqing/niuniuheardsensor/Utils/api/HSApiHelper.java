@@ -1,6 +1,7 @@
 package com.aiqing.niuniuheardsensor.Utils.api;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
@@ -46,6 +47,9 @@ public class HSApiHelper {
 
             map.put("mobile", record.getNumber() + "");
 
+            if (!TextUtils.isEmpty(record.getReupload_id()))
+                map.put("id", record.getReupload_id());
+
             map.put("duration", record.getType() == 3 ? "0" : String.valueOf(record.getDuration()));
 
             SimpleDateFormat sfd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -83,7 +87,7 @@ public class HSApiHelper {
                 Log.i(TAG, response.toString());
 
                 if (callBack != null)
-                    callBack.onSuccess(false, "");
+                    callBack.onSuccess(response);
 
             }
 
@@ -102,7 +106,7 @@ public class HSApiHelper {
 
 
     static public interface CallBack {
-        public void onSuccess(boolean needReupload, String id);
+        public void onSuccess(JSONObject response);
 
         public void onFailure();
     }

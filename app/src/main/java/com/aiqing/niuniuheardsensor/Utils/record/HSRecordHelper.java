@@ -26,7 +26,7 @@ public class HSRecordHelper {
 
 
     private static MediaPlayer mediaPlayer;
-    private static boolean isPlaying = false;
+    public static boolean isPlaying = false;
 
     private static MyAudioRecorder recorder;
 
