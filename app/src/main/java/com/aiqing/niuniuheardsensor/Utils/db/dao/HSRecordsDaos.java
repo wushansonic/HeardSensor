@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class HSRecordsDaos extends OrmLiteSqliteOpenHelper {
     private static String TABLE_NAME = "ns_tele_record.db";
-    private static final int VSERSION = 4;
+    private static final int VSERSION = 5;
     private Dao<HSRecord, Integer> recordsDao;
     private static Context context;
 
@@ -103,6 +103,15 @@ public class HSRecordsDaos extends OrmLiteSqliteOpenHelper {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public void deleteRecordsByIds(List<Integer> ids) {
+        try {
+            getRecordsDao().deleteIds(ids);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void clearAllRecords() {

@@ -149,4 +149,12 @@ public class HSRecordHelper {
         mediaPlayer.stop();
         isPlaying = false;
     }
+
+
+    public static void deleteRecordFile(String filePath) {
+        File f = new File(filePath);
+        if (f.exists()) {
+            f.delete();
+        }
+    }
 }

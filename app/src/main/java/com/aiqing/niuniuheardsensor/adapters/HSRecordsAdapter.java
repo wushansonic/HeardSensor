@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.aiqing.niuniuheardsensor.R;
 import com.aiqing.niuniuheardsensor.Utils.HSRecordsUploadHelper;
+import com.aiqing.niuniuheardsensor.Utils.api.HSApiHelper;
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
 import com.aiqing.niuniuheardsensor.Utils.record.HSRecordHelper;
 
@@ -24,6 +25,7 @@ import java.util.List;
 public class HSRecordsAdapter extends BaseAdapter {
     private List<HSRecord> recordList = new ArrayList<>();
     private Context context;
+    private boolean showSelect = false;
 
 
     public HSRecordsAdapter(List<HSRecord> recordList, Context context) {
@@ -126,7 +128,47 @@ public class HSRecordsAdapter extends BaseAdapter {
             play_record.setVisibility(View.GONE);
         }
 
+        TextView reupload = (TextView) convertView.findViewById(R.id.reupload);
+        if (TextUtils.isEmpty(record.getReupload_id())) {
+            reupload.setVisibility(View.GONE);
+        } else {
+            reupload.setVisibility(View.VISIBLE);
+
+            reupload.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    List<HSRecord> records = new ArrayList<HSRecord>();
+                    records.add(record);
+                    HSApiHelper.requestReleaseRecord(records, context, null);
+                }
+            });
+        }
+
+        final ImageView select = (ImageView) convertView.findViewById(R.id.select);
+        if (showSelect) {
+            select.setBackgroundResource(record.select ? R.drawable.btn_selected : R.drawable.btn_unselect);
+            select.setVisibility(View.VISIBLE);
+            select.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (record.select) {
+                        record.select = false;
+                        select.setBackgroundResource(R.drawable.btn_unselect);
+                    } else {
+                        record.select = true;
+                        select.setBackgroundResource(R.drawable.btn_selected);
+                    }
+                }
+            });
+        } else {
+            select.setVisibility(View.GONE);
+        }
+
 
         return convertView;
+    }
+
+    public void setShowSelect(boolean showSelect) {
+        this.showSelect = showSelect;
     }
 }

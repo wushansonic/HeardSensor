@@ -28,6 +28,8 @@ public class HSRecord {
     @DatabaseField(columnName = "reupload_id")
     String reupload_id;
 
+    public boolean select;
+
 
     public HSRecord() {
     }
