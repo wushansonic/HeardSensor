@@ -137,8 +137,8 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
                     if (status == 201) {
 
                         if (records_need_upload != null && records_need_upload.size() > 0) {
-                            HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(records.get(records.size() - 1));
                             records.get(records.size() - 1).setReupload_id(String.valueOf(id));
+                            HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(records.get(records.size() - 1));
                             recordsAdapter.notifyDataSetChanged();
                         }
                     }
