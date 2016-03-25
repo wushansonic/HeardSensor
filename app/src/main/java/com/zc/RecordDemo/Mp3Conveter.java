@@ -9,7 +9,7 @@ public class Mp3Conveter {
     public static final int SAMPLE_RATE = 44100;
     public static final int BITRATE = 8;
     public static final int MODE = 1;
-    public static final int QUALITY = 2;
+    public static final int QUALITY = 10;
 
     public native void initEncoder(int numChannels, int sampleRate, int bitRate, int mode, int quality);
 

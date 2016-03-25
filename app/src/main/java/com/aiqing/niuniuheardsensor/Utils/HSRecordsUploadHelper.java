@@ -36,6 +36,9 @@ public class HSRecordsUploadHelper {
         ((Activity) context).startManagingCursor(cursor);
         boolean hasRecord = cursor.moveToFirst();
         if (hasRecord) Log.i(TAG, "=============================");
+        List<HSRecord> records = HSRecordsDaos.getInstance(context).getAllRecords();
+        HSRecord latestRecord = (records != null && records.size() > 0) ? records.get(0) : null;
+        Date newLatestTime = null;
         while (hasRecord) {
             int type = cursor.getInt(cursor.getColumnIndex(CallLog.Calls.TYPE));
             long duration = cursor.getLong(cursor.getColumnIndex(CallLog.Calls.DURATION));
@@ -46,28 +49,31 @@ public class HSRecordsUploadHelper {
             String time = sfd.format(date);
             hasRecord = cursor.moveToNext();
 
-            List<HSRecord> records = HSRecordsDaos.getInstance(context).getAllRecords();
-
             if (records == null || records.size() <= 0) {
-                HSRecordsDaos.getInstance(context).addOneRecord(new HSRecord(date, type, number, duration, "", false, ""));
+                HSRecord record_tmp = new HSRecord(date, type, number, duration, "", false, "");
+                HSRecordsDaos.getInstance(context).addOneRecord(record_tmp);
+                records = HSRecordsDaos.getInstance(context).getAllRecords();
+                latestRecord = record_tmp;
                 break;
             } else {
-                HSRecord latestRecord = records.get(records.size() - 1);
                 if (date.after(latestRecord.getDate())) {
                     Log.i(TAG, "type:" + type + " duration:" + duration + " number:" + number + " time:" + time);
                     String filePath = "";
-                    if (duration > 0 && type != 3) {
-                        filePath = MyAudioRecorder.getAudioMp3Filename();
-                    }
+//                    if (duration > 0 && type != 3) {
+                    filePath = MyAudioRecorder.getAudioMp3Filename();
+//                    }
                     HSRecord record = new HSRecord(date, type, number, duration, filePath, false, "");
                     HSRecordsDaos.getInstance(context).addOneRecord(record);
                     resultRecords.add(record);
+                    newLatestTime = date;
                 } else {
                     break;
                 }
             }
-
-
+        }
+        if (newLatestTime != null) {
+            latestRecord.setDate(newLatestTime);
+            HSRecordsDaos.getInstance(context).addOneRecord(latestRecord);
         }
 
         return resultRecords;
