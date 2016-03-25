@@ -98,7 +98,7 @@ public class HSRecordsAdapter extends BaseAdapter {
         tv_duration.setText((record.getType() == 3 ? "0" : String.valueOf(record.getDuration())) + "秒");
 
         ImageView play_record = (ImageView) convertView.findViewById(R.id.play_record);
-        if (!TextUtils.isEmpty(record.getFile_path())) {
+        if (!TextUtils.isEmpty(record.getFile_path()) && (record.getType() != 3 && record.getDuration() != 0)) {
             play_record.setVisibility(View.VISIBLE);
 
             final boolean isPlay = record.isPlay_state();
