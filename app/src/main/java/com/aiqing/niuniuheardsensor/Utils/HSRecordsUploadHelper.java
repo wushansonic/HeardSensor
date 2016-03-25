@@ -53,7 +53,7 @@ public class HSRecordsUploadHelper {
                 HSRecord record_tmp = new HSRecord(date, type, number, duration, "", false, "");
                 HSRecordsDaos.getInstance(context).addOneRecord(record_tmp);
                 records = HSRecordsDaos.getInstance(context).getAllRecords();
-                latestRecord = record_tmp;
+                latestRecord = (records != null && records.size() > 0) ? records.get(0) : null;
                 break;
             } else {
                 if (date.after(latestRecord.getDate())) {
@@ -63,9 +63,22 @@ public class HSRecordsUploadHelper {
                     filePath = MyAudioRecorder.getAudioMp3Filename();
 //                    }
                     HSRecord record = new HSRecord(date, type, number, duration, filePath, false, "");
-                    HSRecordsDaos.getInstance(context).addOneRecord(record);
-                    resultRecords.add(record);
-                    newLatestTime = date;
+
+                    boolean haveSameDate = false;
+                    for (HSRecord record1 : resultRecords) {
+                        Date date1 = record1.getDate();
+                        Date date2 = record.getDate();
+                        if (!date1.after(date2) && !date1.before(date2)) {
+                            haveSameDate = true;
+                            break;
+                        }
+                    }
+
+                    if (!haveSameDate) {
+                        resultRecords.add(record);
+                        newLatestTime = date;
+                        HSRecordsDaos.getInstance(context).addOneRecord(record);
+                    }
                 } else {
                     break;
                 }
