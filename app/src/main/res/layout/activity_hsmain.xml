@@ -42,7 +42,7 @@
                 android:id="@+id/phone_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/change_mobile"
@@ -51,7 +51,7 @@
                 android:layout_marginLeft="5dp"
                 android:text="修改"
                 android:textColor="@color/colorOrange1"
-                android:textSize="20sp" />
+                android:textSize="14sp" />
 
         </LinearLayout>
 
@@ -61,6 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right|center_vertical"
             android:text="编辑记录"
+            android:textSize="14sp"
             android:textColor="@color/colorOrange1" />
 
 
@@ -82,6 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:text="全选"
+            android:textSize="14sp"
             android:textColor="@color/colorOrange1" />
 
         <TextView
@@ -90,6 +92,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:text="删除"
+            android:textSize="14sp"
             android:textColor="@color/colorOrange1" />
     </LinearLayout>
 

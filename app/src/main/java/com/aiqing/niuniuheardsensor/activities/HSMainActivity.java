@@ -74,7 +74,7 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
         else {
             phone_status.setText("我的号码:" + myMobile);
             HSApiHelper.myMobile = myMobile;
-            checkAndUploadRecords();
+//            checkAndUploadRecords();
 
             startCheckThread();
         }
@@ -109,7 +109,7 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
 
         final List<HSRecord> records_need_upload = HSRecordsUploadHelper.checkNeedUpload(this);
 
-        final HSRecord record = (records_need_upload != null && records_need_upload.size() > 0) ? records_need_upload.get(0) : null;
+//        final HSRecord record = (records_need_upload != null && records_need_upload.size() > 0) ? records_need_upload.get(0) : null;
 
         Log.i("HS U", "need upload records count:" + (records_need_upload == null ? 0 : records_need_upload.size()));
 
@@ -121,8 +121,11 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
 //                records.addAll(recordsDB);
 //            }
 
+            for (int i = records_need_upload.size() - 1; i >= 0; i--) {
+                records.add(records_need_upload.get(i));
+            }
 
-            records.addAll(records_need_upload);
+
             recordsAdapter.notifyDataSetChanged();
 
 
