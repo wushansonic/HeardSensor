@@ -38,7 +38,6 @@ public class HSRecordsUploadHelper {
         if (hasRecord) Log.i(TAG, "=============================");
         List<HSRecord> records = HSRecordsDaos.getInstance(context).getAllRecords();
         HSRecord latestRecord = (records != null && records.size() > 0) ? records.get(0) : null;
-        Date newLatestTime = null;
         while (hasRecord) {
             int type = cursor.getInt(cursor.getColumnIndex(CallLog.Calls.TYPE));
             long duration = cursor.getLong(cursor.getColumnIndex(CallLog.Calls.DURATION));
@@ -76,16 +75,19 @@ public class HSRecordsUploadHelper {
 
                     if (!haveSameDate) {
                         resultRecords.add(record);
-                        newLatestTime = date;
-                        HSRecordsDaos.getInstance(context).addOneRecord(record);
                     }
                 } else {
                     break;
                 }
             }
         }
-        if (newLatestTime != null) {
-            latestRecord.setDate(newLatestTime);
+
+        if (resultRecords.size() > 0) {
+            for (int i = resultRecords.size() - 1; i >= 0; i--) {
+                HSRecordsDaos.getInstance(context).addOneRecord(resultRecords.get(i));
+            }
+
+            latestRecord.setDate(resultRecords.get(0).getDate());
             HSRecordsDaos.getInstance(context).addOneRecord(latestRecord);
         }
 
