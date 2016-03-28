@@ -286,6 +286,7 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
                 String mobile = sweetAlertDialog.getMobile();
                 if (checkMobile(mobile, sweetAlertDialog.getDialog_mobile_edit())) {
                     HSApplication.asp.write(SPAppInner.MOBILE, mobile);
+                    HSApiHelper.myMobile = mobile;
                     sweetAlertDialog.dismiss();
 
                     phone_status.setText("我的号码：" + mobile);
