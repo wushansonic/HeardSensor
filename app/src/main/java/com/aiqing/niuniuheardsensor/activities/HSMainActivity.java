@@ -63,6 +63,8 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         Log.i("HS U", "onCreate");
 
+
+        HSRecordHelper.isPlaying = false;
         setContentView(R.layout.activity_hsmain);
 
         initViews();
@@ -343,5 +345,6 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
     protected void onDestroy() {
         super.onDestroy();
         goOn = false;
+        HSRecordHelper.isPlaying = false;
     }
 }
