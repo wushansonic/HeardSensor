@@ -139,10 +139,15 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
                     int status = response.optInt("status");
                     int id = response.optInt("id");
 
-                    if (status == 201) {
+                    if (status != 200) {
 
                         if (records_need_upload != null && records_need_upload.size() > 0) {
-                            records.get(records.size() - 1).setReupload_id(String.valueOf(id));
+
+                            if (status == 201)
+                                records.get(records.size() - 1).setReupload_id(String.valueOf(id));
+                            else
+                                records.get(records.size() - 1).setReupload_id(String.valueOf(-1));
+
                             HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(records.get(records.size() - 1));
                             recordsAdapter.notifyDataSetChanged();
                         }
@@ -152,6 +157,11 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
                 @Override
                 public void onFailure() {
                     //finish();
+                    if (records_need_upload != null && records_need_upload.size() > 0) {
+                        records.get(records.size() - 1).setReupload_id(String.valueOf(-1));
+                        HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(records.get(records.size() - 1));
+                        recordsAdapter.notifyDataSetChanged();
+                    }
                 }
             });
         } else {

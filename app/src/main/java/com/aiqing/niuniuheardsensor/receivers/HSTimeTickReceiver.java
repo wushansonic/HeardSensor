@@ -4,11 +4,10 @@ import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.aiqing.niuniuheardsensor.activities.HSMainActivity;
 import com.aiqing.niuniuheardsensor.services.HSService;
-
-import java.util.List;
 
 /**
  * Created by blue on 16/3/14.
@@ -35,21 +34,24 @@ public class HSTimeTickReceiver extends BroadcastReceiver {
 //            if (!isAppRunning) {
 //                openHS(context);
 //            }
-
+            Log.i("HSTimeTickReceiver", "ACTION_TIME_TICK");
             boolean isServiceRunning = false;
 
             ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 
 
             for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-                if ("io.rong.push.NNService".equals(service.service.getClassName())) {
+                if ("com.aiqing.niuniuheardsensor.services.HSServicee".equals(service.service.getClassName())) {
                     isServiceRunning = true;
                 }
             }
             if (!isServiceRunning) {
+                Log.i("HSTimeTickReceiver", "startService");
                 Intent i = new Intent(context, HSService.class);
                 context.startService(i);
 
+            }else {
+                Log.i("HSTimeTickReceiver", "do not startService");
             }
 
         }

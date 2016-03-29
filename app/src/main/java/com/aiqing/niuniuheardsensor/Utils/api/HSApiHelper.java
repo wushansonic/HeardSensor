@@ -47,8 +47,9 @@ public class HSApiHelper {
 
             map.put("mobile", record.getNumber() + "");
 
-            if (!TextUtils.isEmpty(record.getReupload_id()))
+            if (!TextUtils.isEmpty(record.getReupload_id()) && !record.getReupload_id().equals("-1")) {
                 map.put("id", record.getReupload_id());
+            }
 
             map.put("duration", record.getType() == 3 ? "0" : String.valueOf(record.getDuration()));
 
