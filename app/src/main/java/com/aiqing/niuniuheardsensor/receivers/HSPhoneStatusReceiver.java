@@ -5,8 +5,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.aiqing.niuniuheardsensor.Utils.HSRecordsUploadHelper;
+import com.aiqing.niuniuheardsensor.Utils.api.HSApiHelper;
+import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
+import com.aiqing.niuniuheardsensor.Utils.db.dao.HSRecordsDaos;
 import com.aiqing.niuniuheardsensor.Utils.record.HSRecordHelper;
 import com.aiqing.niuniuheardsensor.activities.HSMainActivity;
+
+import org.json.JSONObject;
+
+import java.util.List;
 
 /**
  * Created by blue on 16/3/11.
@@ -19,42 +27,6 @@ public class HSPhoneStatusReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-//        // 如果是拨打电话
-//        if (intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)) {
-//            mIncomingFlag = false;
-//            String phoneNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
-//            Log.i(TAG, "HS call OUT:" + phoneNumber);
-//
-//
-//            openHS(context);
-//
-//
-//        } else {
-//            // 如果是来电
-//            TelephonyManager tManager = (TelephonyManager) context
-//                    .getSystemService(Service.TELEPHONY_SERVICE);
-//            switch (tManager.getCallState()) {
-//
-//                case TelephonyManager.CALL_STATE_RINGING:
-//                    mIncomingNumber = intent.getStringExtra("incoming_number");
-//                    mIncomingFlag = true;
-//                    Log.i(TAG, "HS RINGING :" + mIncomingNumber);
-//                    startHSService(context,0);
-//                    openHS(context);
-//                    break;
-//                case TelephonyManager.CALL_STATE_OFFHOOK:
-//                    Log.i(TAG, "HS incoming ACCEPT :" + mIncomingNumber);
-//                    openHS(context);
-//                    break;
-//                case TelephonyManager.CALL_STATE_IDLE:
-//                    Log.i(TAG, "CALL_STATE_IDLE");
-//                    startHSService(context, 1);
-//                    openHS(context);
-//                    break;
-//            }
-//        }
-
-
         String phoneState = intent.getAction();
         if (phoneState.equals(Intent.ACTION_NEW_OUTGOING_CALL)) {
             String phoneNum = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);//拨出号码
@@ -76,7 +48,7 @@ public class HSPhoneStatusReceiver extends BroadcastReceiver {
 
         if (phoneState.equals(ForeGroundCallState.DISCONNECTED)) {
             HSRecordHelper.stopRecord_3();
-
+            checkAndUploadRecords(context);
             openHS(context);
         }
     }
@@ -105,6 +77,53 @@ public class HSPhoneStatusReceiver extends BroadcastReceiver {
         activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         // 启动Activity
         context.startActivity(activityIntent);
+    }
+
+
+    private void checkAndUploadRecords(Context context) {
+
+        final List<HSRecord> records_need_upload = HSRecordsUploadHelper.checkNeedUpload(context);
+
+//        final HSRecord record = (records_need_upload != null && records_need_upload.size() > 0) ? records_need_upload.get(0) : null;
+
+        Log.i("HS U", "need upload records count:" + (records_need_upload == null ? 0 : records_need_upload.size()));
+
+        if (records_need_upload != null && records_need_upload.size() > 0) {
+
+            HSApiHelper.requestReleaseRecord(records_need_upload, context, new HSApiHelper.CallBack() {
+                @Override
+                public void onSuccess(JSONObject response) {
+                    //finish();
+
+                    int status = response.optInt("status");
+                    int id = response.optInt("id");
+
+                    if (status != 200) {
+
+                        if (records_need_upload != null && records_need_upload.size() > 0) {
+
+                            if (status == 201)
+                                records_need_upload.get(0).setReupload_id(String.valueOf(id));
+                            else
+                                records_need_upload.get(0).setReupload_id(String.valueOf(-1));
+
+                            HSRecordsDaos.getInstance(context).addOneRecord(records_need_upload.get(0));
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure() {
+                    //finish();
+                    if (records_need_upload != null && records_need_upload.size() > 0) {
+                        records_need_upload.get(0).setReupload_id(String.valueOf(-1));
+                        HSRecordsDaos.getInstance(context).addOneRecord(records_need_upload.get(0));
+                    }
+                }
+            });
+        } else {
+            //   finish();
+        }
     }
 
 

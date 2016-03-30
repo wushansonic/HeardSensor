@@ -77,7 +77,7 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
             phone_status.setText("我的号码:" + myMobile);
             HSApiHelper.myMobile = myMobile;
 //            checkAndUploadRecords();
-
+            startService(new Intent(this, HSService.class));
             startCheckThread();
         }
 
@@ -107,7 +107,6 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
     }
 
     private void checkAndUploadRecords() {
-        startService(new Intent(this, HSService.class));
 
         final List<HSRecord> records_need_upload = HSRecordsUploadHelper.checkNeedUpload(this);
 
@@ -131,39 +130,39 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
             recordsAdapter.notifyDataSetChanged();
 
 
-            HSApiHelper.requestReleaseRecord(records_need_upload, this, new HSApiHelper.CallBack() {
-                @Override
-                public void onSuccess(JSONObject response) {
-                    //finish();
-
-                    int status = response.optInt("status");
-                    int id = response.optInt("id");
-
-                    if (status != 200) {
-
-                        if (records_need_upload != null && records_need_upload.size() > 0) {
-
-                            if (status == 201)
-                                records.get(records.size() - 1).setReupload_id(String.valueOf(id));
-                            else
-                                records.get(records.size() - 1).setReupload_id(String.valueOf(-1));
-
-                            HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(records.get(records.size() - 1));
-                            recordsAdapter.notifyDataSetChanged();
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure() {
-                    //finish();
-                    if (records_need_upload != null && records_need_upload.size() > 0) {
-                        records.get(records.size() - 1).setReupload_id(String.valueOf(-1));
-                        HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(records.get(records.size() - 1));
-                        recordsAdapter.notifyDataSetChanged();
-                    }
-                }
-            });
+//            HSApiHelper.requestReleaseRecord(records_need_upload, this, new HSApiHelper.CallBack() {
+//                @Override
+//                public void onSuccess(JSONObject response) {
+//                    //finish();
+//
+//                    int status = response.optInt("status");
+//                    int id = response.optInt("id");
+//
+//                    if (status != 200) {
+//
+//                        if (records_need_upload != null && records_need_upload.size() > 0) {
+//
+//                            if (status == 201)
+//                                records.get(records.size() - 1).setReupload_id(String.valueOf(id));
+//                            else
+//                                records.get(records.size() - 1).setReupload_id(String.valueOf(-1));
+//
+//                            HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(records.get(records.size() - 1));
+//                            recordsAdapter.notifyDataSetChanged();
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure() {
+//                    //finish();
+//                    if (records_need_upload != null && records_need_upload.size() > 0) {
+//                        records.get(records.size() - 1).setReupload_id(String.valueOf(-1));
+//                        HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(records.get(records.size() - 1));
+//                        recordsAdapter.notifyDataSetChanged();
+//                    }
+//                }
+//            });
         } else {
             //   finish();
         }
