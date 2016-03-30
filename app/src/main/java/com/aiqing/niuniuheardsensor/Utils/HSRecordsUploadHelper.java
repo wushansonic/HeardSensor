@@ -41,7 +41,7 @@ public class HSRecordsUploadHelper {
         while (hasRecord) {
             int type = cursor.getInt(cursor.getColumnIndex(CallLog.Calls.TYPE));
             long duration = cursor.getLong(cursor.getColumnIndex(CallLog.Calls.DURATION));
-            long number = cursor.getLong(cursor.getColumnIndex(CallLog.Calls.NUMBER));
+            String number = cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER));
 
             SimpleDateFormat sfd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date date = new Date(Long.parseLong(cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.DATE))));

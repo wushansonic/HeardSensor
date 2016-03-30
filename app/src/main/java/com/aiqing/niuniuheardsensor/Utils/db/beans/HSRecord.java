@@ -18,7 +18,7 @@ public class HSRecord {
     @DatabaseField(columnName = "type")
     Integer type;
     @DatabaseField(columnName = "number")
-    Long number;
+    String number;
     @DatabaseField(columnName = "duration")
     Long duration;
     @DatabaseField(columnName = "file_path")
@@ -34,7 +34,7 @@ public class HSRecord {
     public HSRecord() {
     }
 
-    public HSRecord(Date date, Integer type, Long number, Long duration, String filePath, boolean play_state, String reupload_id) {
+    public HSRecord(Date date, Integer type, String number, Long duration, String filePath, boolean play_state, String reupload_id) {
         this.date = date;
         this.type = type;
         this.number = number;
@@ -68,11 +68,11 @@ public class HSRecord {
         this.type = type;
     }
 
-    public Long getNumber() {
+    public String getNumber() {
         return number;
     }
 
-    public void setNumber(Long number) {
+    public void setNumber(String number) {
         this.number = number;
     }
 

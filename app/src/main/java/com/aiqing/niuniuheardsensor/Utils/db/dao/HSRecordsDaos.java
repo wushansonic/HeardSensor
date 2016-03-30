@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class HSRecordsDaos extends OrmLiteSqliteOpenHelper {
     private static String TABLE_NAME = "ns_tele_record.db";
-    private static final int VSERSION = 5;
+    private static final int VSERSION = 6;
     private Dao<HSRecord, Integer> recordsDao;
     private static Context context;
 
@@ -174,7 +174,7 @@ public class HSRecordsDaos extends OrmLiteSqliteOpenHelper {
         while (hasRecord) {
             int type = cursor.getInt(cursor.getColumnIndex(CallLog.Calls.TYPE));
             long duration = cursor.getLong(cursor.getColumnIndex(CallLog.Calls.DURATION));
-            long number = cursor.getLong(cursor.getColumnIndex(CallLog.Calls.NUMBER));
+            String number = cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER));
 
             SimpleDateFormat sfd = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             Date date = new Date(Long.parseLong(cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.DATE))));
