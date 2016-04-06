@@ -6,7 +6,7 @@ package com.zc.RecordDemo;
  */
 public class Mp3Conveter {
     public static final int NUM_CHANNELS = 1;
-    public static final int SAMPLE_RATE = 44100;
+    public static int SAMPLE_RATE = 44100;
     public static final int BITRATE = 8;
     public static final int MODE = 1;
     public static final int QUALITY = 10;
