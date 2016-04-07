@@ -77,7 +77,7 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
             phone_status.setText("我的号码:" + myMobile);
             HSApiHelper.myMobile = myMobile;
 //            checkAndUploadRecords();
-
+            startService(new Intent(this, HSService.class));
             startCheckThread();
         }
 
@@ -107,7 +107,7 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
     }
 
     private void checkAndUploadRecords() {
-        startService(new Intent(this, HSService.class));
+//        startService(new Intent(this, HSService.class));
 
         final List<HSRecord> records_need_upload = HSRecordsUploadHelper.checkNeedUpload(this);
 
