@@ -1,5 +1,6 @@
 package com.aiqing.niuniuheardsensor.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -7,10 +8,12 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aiqing.niuniuheardsensor.HSApplication;
 import com.aiqing.niuniuheardsensor.R;
@@ -18,17 +21,25 @@ import com.aiqing.niuniuheardsensor.Utils.HSRecordsUploadHelper;
 import com.aiqing.niuniuheardsensor.Utils.InputUtil;
 import com.aiqing.niuniuheardsensor.Utils.SPAppInner;
 import com.aiqing.niuniuheardsensor.Utils.api.HSApiHelper;
+import com.aiqing.niuniuheardsensor.Utils.api.HSHttpClient;
+import com.aiqing.niuniuheardsensor.Utils.api.HSRequestParams;
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
 import com.aiqing.niuniuheardsensor.Utils.db.dao.HSRecordsDaos;
 import com.aiqing.niuniuheardsensor.Utils.record.HSRecordHelper;
 import com.aiqing.niuniuheardsensor.adapters.HSRecordsAdapter;
 import com.aiqing.niuniuheardsensor.services.HSService;
 import com.aiqing.niuniuheardsensor.widgets.SweetAlertDialog;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
+import org.apache.http.Header;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class HSMainActivity extends HSBaseActivity implements View.OnClickListener {
@@ -41,7 +52,7 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
 
     private HSRecordsAdapter recordsAdapter;
 
-    private List<HSRecord> records = new ArrayList<>();
+    private List<HSRecord> records = new ArrayList<HSRecord>();
 
     private boolean isEditState = false;
     private boolean isSelectAll = false;
@@ -80,6 +91,8 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
             startService(new Intent(this, HSService.class));
             startCheckThread();
         }
+
+        //      requestReleaseRecord(this);
 
     }
 
@@ -148,8 +161,18 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
                             else
                                 records.get(records.size() - 1).setReupload_id(String.valueOf(-1));
 
-                            HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(records.get(records.size() - 1));
+
+                            for (HSRecord record : records) {
+                                HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(record);
+                            }
+
+
                             recordsAdapter.notifyDataSetChanged();
+                        }
+                    } else {
+                        for (HSRecord record : records) {
+                            record.setReupload_id("");
+                            HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(record);
                         }
                     }
                 }
@@ -176,12 +199,78 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
         Log.i("HS U", "onResume");
 
         List<HSRecord> recordsDB = HSRecordsDaos.getInstance(this).getAllRecords();
+
+//        for (HSRecord record : recordsDB) {
+//            if (record.getNumber().equals("13636384586")) {
+//                record.setReupload_id("-1");
+//            }
+//        }
+
+
         if (recordsDB != null && recordsDB.size() > 0) {
             recordsDB.remove(0);
             records.clear();
             records.addAll(recordsDB);
         }
         recordsAdapter.notifyDataSetChanged();
+
+    }
+
+
+    static public void requestReleaseRecord(Context context) {
+
+        HSRequestParams params = new HSRequestParams();
+
+        List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
+
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("call_type", "out");
+
+        map.put("mobile", "13636384586");
+
+        map.put("duration", "68");
+
+        map.put("started_at", "2016-04-13 10:12:30");
+
+        maps.add(map);
+
+        params.put("issue_phones", maps);
+
+
+        String filePath = "/sdcard/heardsensor/20160413101230.mp3";
+
+        try {
+            params.put("audio_record", new File(filePath));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+        params.put("customer_service_mobile", HSApiHelper.myMobile);
+
+
+        HSHttpClient.instance().post(HSHttpClient.API_ISSUE_PHONES, params, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        super.onSuccess(statusCode, headers, response);
+
+                        Log.i("HS UPLOAD", response.toString());
+
+
+                    }
+
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable
+                            throwable) {
+                        super.onFailure(statusCode, headers, responseString, throwable);
+                        Log.i("HS UPLOAD", responseString);
+
+                    }
+                }
+
+        );
+
 
     }
 
@@ -198,6 +287,26 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
         recordsAdapter = new HSRecordsAdapter(records, this);
         record_list.setAdapter(recordsAdapter);
         record_list.setDividerHeight(1);
+
+        record_list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                new SweetAlertDialog(HSMainActivity.this).setHint("请输入管理员密码").setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+
+                        String mobile = sweetAlertDialog.getMobile();
+                        if (mobile.equals("266723")) {
+                            records.get(position).setReupload_id("-1");
+                            recordsAdapter.notifyDataSetChanged();
+                        } else {
+                            Toast.makeText(HSMainActivity.this, "密码错误", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }).show();
+                return false;
+            }
+        });
 
         edit = (TextView) findViewById(R.id.edit);
         edit.setOnClickListener(new View.OnClickListener() {

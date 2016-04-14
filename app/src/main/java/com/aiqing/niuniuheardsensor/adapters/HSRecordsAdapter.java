@@ -25,7 +25,7 @@ import java.util.List;
  * Created by blue on 16/3/17.
  */
 public class HSRecordsAdapter extends BaseAdapter {
-    private List<HSRecord> recordList = new ArrayList<>();
+    private List<HSRecord> recordList = new ArrayList<HSRecord>();
     private Context context;
     private boolean showSelect = false;
 

@@ -7,8 +7,13 @@ android {
         applicationId 'com.aiqing.niuniuheardsensor'
         minSdkVersion 11
         targetSdkVersion 22
-        versionCode 4
-        versionName "3.1"
+        versionCode 5
+        versionName "3.2"
+        multiDexEnabled true
+    }
+
+    configurations{
+        all*.exclude module: 'qiniu-android-sdk-7.1.2.jar'
     }
     buildTypes {
         release {
@@ -37,4 +42,6 @@ dependencies {
     compile 'com.loopj.android:android-async-http:1.4.7'
     compile 'com.alibaba:fastjson:1.2.7'
     compile 'com.android.support:appcompat-v7:22.2.0'
+    compile 'com.squareup.okhttp:okhttp:2.7.5'
+    compile 'com.android.support:multidex:1.0.0'
 }

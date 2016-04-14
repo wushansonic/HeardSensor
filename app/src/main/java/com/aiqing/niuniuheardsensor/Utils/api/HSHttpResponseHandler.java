@@ -1,6 +1,5 @@
 package com.aiqing.niuniuheardsensor.Utils.api;
 
-import android.service.media.MediaBrowserService;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;

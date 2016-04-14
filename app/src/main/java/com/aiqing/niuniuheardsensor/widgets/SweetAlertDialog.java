@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
@@ -56,6 +57,7 @@ public class SweetAlertDialog extends Dialog implements View.OnClickListener {
     private ProgressBar progressBar;
 
     private EditText dialog_mobile_edit;
+    private String hint;
 
     private int mContentTextGravity = Gravity.CENTER_HORIZONTAL;
 
@@ -162,6 +164,8 @@ public class SweetAlertDialog extends Dialog implements View.OnClickListener {
 
 
         dialog_mobile_edit = (EditText) findViewById(R.id.dialog_mobile_edit);
+        if (!TextUtils.isEmpty(hint))
+            dialog_mobile_edit.setHint(hint);
         if (showEdit) {
             dialog_mobile_edit.setVisibility(View.VISIBLE);
         } else {
@@ -315,6 +319,11 @@ public class SweetAlertDialog extends Dialog implements View.OnClickListener {
 
     public SweetAlertDialog setConfirmClickListener2(OnSweetClickListener listener) {
         mConfirmClickListener2 = listener;
+        return this;
+    }
+
+    public SweetAlertDialog setHint(String hint) {
+        this.hint = hint;
         return this;
     }
 

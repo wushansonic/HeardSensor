@@ -26,7 +26,7 @@ public class HSRecordsUploadHelper {
 
 
     public static List<HSRecord> checkNeedUpload(Context context) {
-        List<HSRecord> resultRecords = new ArrayList<>();
+        List<HSRecord> resultRecords = new ArrayList<HSRecord>();
 
         Cursor cursor = context.getContentResolver().query(CallLog.Calls.CONTENT_URI,
                 new String[]{CallLog.Calls.DURATION, CallLog.Calls.TYPE, CallLog.Calls.DATE, CallLog.Calls.NUMBER},
@@ -61,7 +61,7 @@ public class HSRecordsUploadHelper {
 //                    if (duration > 0 && type != 3) {
                     filePath = MyAudioRecorder.getAudioMp3Filename();
 //                    }
-                    HSRecord record = new HSRecord(date, type, number, duration, filePath, false, "");
+                    HSRecord record = new HSRecord(date, type, number, duration, filePath, false, "-1");
 
                     boolean haveSameDate = false;
                     for (HSRecord record1 : resultRecords) {

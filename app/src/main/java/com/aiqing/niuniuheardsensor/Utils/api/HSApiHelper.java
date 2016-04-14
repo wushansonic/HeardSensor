@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.aiqing.niuniuheardsensor.Utils.HSQiniuUploadHelper;
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.zc.RecordDemo.MyAudioRecorder;
@@ -35,10 +36,10 @@ public class HSApiHelper {
         HSRequestParams params = new HSRequestParams();
 
 
-        List<Map<String, String>> maps = new ArrayList<>();
+        List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
 
         for (HSRecord record : records) {
-            Map<String, String> map = new HashMap<>();
+            Map<String, String> map = new HashMap<String, String>();
             if (record.getType() == 1 || record.getType() == 3) {
                 map.put("call_type", "in");
             } else if (record.getType() == 2) {
@@ -57,6 +58,7 @@ public class HSApiHelper {
             String time = sfd.format(record.getDate());
             map.put("started_at", time);
 
+
             maps.add(map);
         }
 
@@ -65,10 +67,12 @@ public class HSApiHelper {
 
         long duration = records.get(0).getType() == 3 ? 0 : records.get(0).getDuration();
 
+        File f = null;
         if (duration > 0) {
             try {
                 String filePath = MyAudioRecorder.getAudioMp3Filename();
-                params.put("audio_record", new File(filePath));
+                f = new File(filePath);
+                params.put("audio_record", f);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -101,6 +105,9 @@ public class HSApiHelper {
                     callBack.onFailure();
             }
         });
+
+
+        HSQiniuUploadHelper.upload(f, "", "");
 
 
     }

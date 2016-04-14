@@ -1,6 +1,5 @@
 package com.aiqing.niuniuheardsensor;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -12,7 +11,7 @@ import com.aiqing.niuniuheardsensor.receivers.HSTimeTickReceiver;
 /**
  * Created by blue on 16/3/14.
  */
-public class HSApplication extends Application{
+public class HSApplication extends android.support.multidex.MultiDexApplication{
 
     private static Context context;
 
