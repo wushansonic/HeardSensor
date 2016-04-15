@@ -98,4 +98,13 @@
         android:textColor="@color/red"
         android:visibility="gone"/>
 
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="2dp"
+        android:text="正在传记录.."
+        android:textColor="@color/red"
+        android:visibility="gone"/>
+
 </LinearLayout>

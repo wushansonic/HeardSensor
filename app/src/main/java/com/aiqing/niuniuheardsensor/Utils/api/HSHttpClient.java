@@ -29,6 +29,5 @@ public class HSHttpClient {
     private static final String API_HOST = HSApplication.getContext().getResources().getString(R.string.API_HOST);
     private static final int API_HTTP_PORT = HSApplication.getContext().getResources().getInteger(R.integer.API_HTTP_PORT);
 
-    public static final String API_ISSUE_PHONES = API_HOST + "/api/" + V + "/issue_phones";
-
+    public static final String API_ISSUE_PHONES = API_HOST + "/api/" + V + "/issue_phones/create_issue_phone";
 }

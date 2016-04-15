@@ -41,7 +41,7 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.loopj.android:android-async-http:1.4.7'
     compile 'com.alibaba:fastjson:1.2.7'
-    compile 'com.android.support:appcompat-v7:22.2.0'
     compile 'com.squareup.okhttp:okhttp:2.7.5'
     compile 'com.android.support:multidex:1.0.0'
+    compile 'com.android.support:appcompat-v7:22.2.0'
 }

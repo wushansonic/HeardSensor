@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.aiqing.niuniuheardsensor.HSApplication;
 import com.aiqing.niuniuheardsensor.R;
+import com.aiqing.niuniuheardsensor.Utils.HSQiniuUploadHelper;
 import com.aiqing.niuniuheardsensor.Utils.HSRecordsUploadHelper;
 import com.aiqing.niuniuheardsensor.Utils.InputUtil;
 import com.aiqing.niuniuheardsensor.Utils.SPAppInner;
@@ -35,7 +36,6 @@ import org.apache.http.Header;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -92,7 +92,8 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
             startCheckThread();
         }
 
-        //      requestReleaseRecord(this);
+        //TODO 删除
+        // requestReleaseRecord(this);
 
     }
 
@@ -124,17 +125,9 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
 
         final List<HSRecord> records_need_upload = HSRecordsUploadHelper.checkNeedUpload(this);
 
-//        final HSRecord record = (records_need_upload != null && records_need_upload.size() > 0) ? records_need_upload.get(0) : null;
-
         Log.i("HS U", "need upload records count:" + (records_need_upload == null ? 0 : records_need_upload.size()));
 
         if (records_need_upload != null && records_need_upload.size() > 0) {
-
-//            List<HSRecord> recordsDB = HSRecordsDaos.getInstance(this).getAllRecords();
-//            if (recordsDB != null && recordsDB.size() > 0) {
-//                records.clear();
-//                records.addAll(recordsDB);
-//            }
 
             for (int i = records_need_upload.size() - 1; i >= 0; i--) {
                 records.add(records_need_upload.get(i));
@@ -150,30 +143,27 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
                     //finish();
 
                     int status = response.optInt("status");
-                    int id = response.optInt("id");
 
                     if (status != 200) {
 
                         if (records_need_upload != null && records_need_upload.size() > 0) {
 
-                            if (status == 201)
-                                records.get(records.size() - 1).setReupload_id(String.valueOf(id));
-                            else
-                                records.get(records.size() - 1).setReupload_id(String.valueOf(-1));
 
-
-                            for (HSRecord record : records) {
+                            for (int i = 0; i < records_need_upload.size(); i++) {
+                                HSRecord record = records.get(records.size() - 1 - i);
+                                record.setStatus(HSRecord.RECORD_NEED_REUPLOAD);
                                 HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(record);
                             }
-
 
                             recordsAdapter.notifyDataSetChanged();
                         }
                     } else {
-                        for (HSRecord record : records) {
-                            record.setReupload_id("");
+                        for (int i = 0; i < records_need_upload.size(); i++) {
+                            HSRecord record = records.get(records.size() - 1 - i);
+                            record.setStatus(HSRecord.RECORD_UPLOAD_COMPLETE);
                             HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(record);
                         }
+                        recordsAdapter.notifyDataSetChanged();
                     }
                 }
 
@@ -181,9 +171,31 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
                 public void onFailure() {
                     //finish();
                     if (records_need_upload != null && records_need_upload.size() > 0) {
-                        records.get(records.size() - 1).setReupload_id(String.valueOf(-1));
-                        HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(records.get(records.size() - 1));
+                        for (int i = 0; i < records_need_upload.size(); i++) {
+                            HSRecord record = records.get(records.size() - 1 - i);
+                            record.setStatus(HSRecord.RECORD_NEED_REUPLOAD);
+                            HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(record);
+                        }
+
                         recordsAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                @Override
+                public void onFileUploadSuccess(HSRecord record) {
+                    record.setStatus(HSRecord.RECORD_FILE_UPLOAD_COMPLETE);
+                    HSRecordsDaos.getInstance(HSMainActivity.this).addOneRecord(record);
+
+                    if (records.size() > 0) {
+                        for (int i = records.size() - 1; i >= 0; i--) {
+                            HSRecord record1 = records.get(i);
+                            if (record1.getId() == record.getId()) {
+                                record1.setStatus(HSRecord.RECORD_FILE_UPLOAD_COMPLETE);
+                                recordsAdapter.notifyDataSetChanged();
+                                break;
+                            }
+                        }
+
                     }
                 }
             });
@@ -199,12 +211,6 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
         Log.i("HS U", "onResume");
 
         List<HSRecord> recordsDB = HSRecordsDaos.getInstance(this).getAllRecords();
-
-//        for (HSRecord record : recordsDB) {
-//            if (record.getNumber().equals("13636384586")) {
-//                record.setReupload_id("-1");
-//            }
-//        }
 
 
         if (recordsDB != null && recordsDB.size() > 0) {
@@ -224,29 +230,42 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
         List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
 
         Map<String, String> map = new HashMap<String, String>();
+
+        final List<String> keys = new ArrayList<>();
+        final Map<String, HSRecord> keysMap = new HashMap<>();
+
         map.put("call_type", "out");
 
-        map.put("mobile", "13636384586");
+        map.put("mobile", "15618863308");
 
         map.put("duration", "68");
 
         map.put("started_at", "2016-04-13 10:12:30");
+
+        String key = "" + System.currentTimeMillis();
+
+        map.put("app_key", key);
+        map.put("file_type", "mp3");
+
+
+        keys.add(key);
+//        keysMap.put(key, record);
 
         maps.add(map);
 
         params.put("issue_phones", maps);
 
 
-        String filePath = "/sdcard/heardsensor/20160413101230.mp3";
+        final String filePath = "/sdcard/heardsensor/1.mp3";
 
-        try {
-            params.put("audio_record", new File(filePath));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            params.put("audio_record", new File(filePath));
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
 
 
-        params.put("customer_service_mobile", HSApiHelper.myMobile);
+        params.put("customer_service_mobile", "15618863308");
 
 
         HSHttpClient.instance().post(HSHttpClient.API_ISSUE_PHONES, params, new JsonHttpResponseHandler() {
@@ -255,6 +274,25 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
                         super.onSuccess(statusCode, headers, response);
 
                         Log.i("HS UPLOAD", response.toString());
+
+
+                        JSONObject data = response.optJSONObject("data");
+
+                        for (String key : keys) {
+                            JSONObject fileObject = data.optJSONObject(key);
+
+
+                            if (fileObject != null) {
+                                String token = fileObject.optString("token");
+                                String key_file = fileObject.optString("key");
+                                String id = fileObject.optString("id");
+
+                                if (!TextUtils.isEmpty(filePath)) {
+                                    HSQiniuUploadHelper.upload(new File(filePath), key_file, token, null, null);
+                                    //TODO 存储ID
+                                }
+                            }
+                        }
 
 
                     }
@@ -297,11 +335,15 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
 
                         String mobile = sweetAlertDialog.getMobile();
                         if (mobile.equals("266723")) {
-                            records.get(position).setReupload_id("-1");
-                            recordsAdapter.notifyDataSetChanged();
+                            if (records.size() > 0 && position < records.size()) {
+                                records.get(records.size() - 1 - position).setStatus(HSRecord.RECORD_NEED_REUPLOAD);
+                                recordsAdapter.notifyDataSetChanged();
+                            }
                         } else {
                             Toast.makeText(HSMainActivity.this, "密码错误", Toast.LENGTH_SHORT).show();
                         }
+
+                        sweetAlertDialog.dismiss();
                     }
                 }).show();
                 return false;

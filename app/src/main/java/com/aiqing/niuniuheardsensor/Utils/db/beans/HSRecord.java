@@ -11,6 +11,12 @@ import java.util.Date;
 @DatabaseTable(tableName = "hs_records")
 public class HSRecord {
 
+    static final public int RECORD_NEED_REUPLOAD = -1;
+    static final public int RECORD_UPLOADING = 0;
+    static final public int RECORD_UPLOAD_COMPLETE = 1;
+    static final public int RECORD_FILE_UPLOAD_COMPLETE = 2;
+
+
     @DatabaseField(columnName = "id", generatedId = true)
     Integer id;
     @DatabaseField(columnName = "date")
@@ -27,6 +33,13 @@ public class HSRecord {
     boolean play_state;
     @DatabaseField(columnName = "reupload_id")
     String reupload_id;
+    /*
+    0:记录上传中
+    1:记录上传成功
+    2:音频上传成功
+     */
+    @DatabaseField(columnName = "status")
+    Integer status;
 
     public boolean select;
 
@@ -34,7 +47,7 @@ public class HSRecord {
     public HSRecord() {
     }
 
-    public HSRecord(Date date, Integer type, String number, Long duration, String filePath, boolean play_state, String reupload_id) {
+    public HSRecord(Date date, Integer type, String number, Long duration, String filePath, boolean play_state, String reupload_id, int status) {
         this.date = date;
         this.type = type;
         this.number = number;
@@ -42,6 +55,7 @@ public class HSRecord {
         this.file_path = filePath;
         this.play_state = play_state;
         this.reupload_id = reupload_id;
+        this.status = status;
     }
 
     public Integer getId() {
@@ -106,5 +120,13 @@ public class HSRecord {
 
     public void setReupload_id(String reupload_id) {
         this.reupload_id = reupload_id;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 }

@@ -7,13 +7,11 @@ import android.util.Log;
 import com.aiqing.niuniuheardsensor.Utils.HSQiniuUploadHelper;
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.zc.RecordDemo.MyAudioRecorder;
 
 import org.apache.http.Header;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +36,9 @@ public class HSApiHelper {
 
         List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
 
+        final List<String> keys = new ArrayList<>();
+        final Map<String, HSRecord> keysMap = new HashMap<>();
+
         for (HSRecord record : records) {
             Map<String, String> map = new HashMap<String, String>();
             if (record.getType() == 1 || record.getType() == 3) {
@@ -52,31 +53,27 @@ public class HSApiHelper {
                 map.put("id", record.getReupload_id());
             }
 
-            map.put("duration", record.getType() == 3 ? "0" : String.valueOf(record.getDuration()));
+            map.put("duration", String.valueOf(record.getDuration()));
 
             SimpleDateFormat sfd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String time = sfd.format(record.getDate());
             map.put("started_at", time);
 
+            String filePath = record.getFile_path();
+            if (!TextUtils.isEmpty(filePath) && record.getDuration() > 0) {
+                String key = "" + System.currentTimeMillis();
+
+                map.put("app_key", key);
+                map.put("file_type", "mp3");
+
+                keys.add(key);
+                keysMap.put(key, record);
+            }
 
             maps.add(map);
         }
 
         params.put("issue_phones", maps);
-
-
-        long duration = records.get(0).getType() == 3 ? 0 : records.get(0).getDuration();
-
-        File f = null;
-        if (duration > 0) {
-            try {
-                String filePath = MyAudioRecorder.getAudioMp3Filename();
-                f = new File(filePath);
-                params.put("audio_record", f);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
 
         params.put("customer_service_mobile", myMobile);
 
@@ -94,6 +91,36 @@ public class HSApiHelper {
                 if (callBack != null)
                     callBack.onSuccess(response);
 
+
+                JSONObject data = response.optJSONObject("data");
+
+                if (data == null)
+                    return;
+
+                for (String key : keys) {
+                    JSONObject fileObject = data.optJSONObject(key);
+
+                    if (fileObject != null) {
+                        String token = fileObject.optString("token");
+                        String key_file = fileObject.optString("key");
+                        int id = fileObject.optInt("id");
+                        HSRecord record = keysMap.get(key);
+                        record.setReupload_id(String.valueOf(id));
+                        String filePath = null;
+                        if (record != null) {
+                            filePath = record.getFile_path();
+                        }
+                        if (!TextUtils.isEmpty(filePath)) {
+                            HSQiniuUploadHelper.upload(new File(filePath), key_file, token, new HSQiniuUploadHelper.Callback() {
+                                @Override
+                                public void onComplete(HSRecord record) {
+                                    callBack.onFileUploadSuccess(record);
+                                }
+                            }, record);
+                        }
+                    }
+                }
+
             }
 
 
@@ -107,9 +134,6 @@ public class HSApiHelper {
         });
 
 
-        HSQiniuUploadHelper.upload(f, "", "");
-
-
     }
 
 
@@ -117,6 +141,8 @@ public class HSApiHelper {
         public void onSuccess(JSONObject response);
 
         public void onFailure();
+
+        public void onFileUploadSuccess(HSRecord record);
     }
 
 }

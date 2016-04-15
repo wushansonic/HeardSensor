@@ -1,7 +1,6 @@
 package com.aiqing.niuniuheardsensor.adapters;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,7 @@ import com.aiqing.niuniuheardsensor.R;
 import com.aiqing.niuniuheardsensor.Utils.HSRecordsUploadHelper;
 import com.aiqing.niuniuheardsensor.Utils.api.HSApiHelper;
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
+import com.aiqing.niuniuheardsensor.Utils.db.dao.HSRecordsDaos;
 import com.aiqing.niuniuheardsensor.Utils.record.HSRecordHelper;
 
 import org.json.JSONObject;
@@ -95,10 +95,10 @@ public class HSRecordsAdapter extends BaseAdapter {
         tv_mobile.setText(record.getNumber() + "");
         tv_time.setText(time);
         tv_type.setText(type);
-        tv_duration.setText((record.getType() == 3 ? "0" : String.valueOf(record.getDuration())) + "秒");
+        tv_duration.setText(String.valueOf(record.getDuration()) + "秒");
 
         ImageView play_record = (ImageView) convertView.findViewById(R.id.play_record);
-        if (!TextUtils.isEmpty(record.getFile_path()) && (record.getType() != 3 && record.getDuration() != 0)) {
+        if (record.getDuration() > 0) {
             play_record.setVisibility(View.VISIBLE);
 
             final boolean isPlay = record.isPlay_state();
@@ -136,7 +136,7 @@ public class HSRecordsAdapter extends BaseAdapter {
         }
 
         final TextView reupload = (TextView) convertView.findViewById(R.id.reupload);
-        if (TextUtils.isEmpty(record.getReupload_id())) {
+        if (record.getStatus() != HSRecord.RECORD_NEED_REUPLOAD) {
             reupload.setVisibility(View.GONE);
         } else {
             reupload.setVisibility(View.VISIBLE);
@@ -144,27 +144,79 @@ public class HSRecordsAdapter extends BaseAdapter {
             reupload.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    List<HSRecord> records = new ArrayList<HSRecord>();
+                    final List<HSRecord> records = new ArrayList<HSRecord>();
                     records.add(record);
                     reupload.setText("正在重传...");
                     HSApiHelper.requestReleaseRecord(records, context, new HSApiHelper.CallBack() {
                         @Override
                         public void onSuccess(JSONObject response) {
                             int status = response.optInt("status");
-                            if (status == 201) {
+
+                            if (status != 200) {
                                 reupload.setText("重传");
+                                if (records != null && records.size() > 0) {
+
+                                    for (HSRecord record : records) {
+                                        record.setStatus(HSRecord.RECORD_NEED_REUPLOAD);
+                                        HSRecordsDaos.getInstance(context).addOneRecord(record);
+                                    }
+                                    notifyDataSetChanged();
+                                }
                             } else {
                                 reupload.setVisibility(View.GONE);
+                                for (HSRecord record : records) {
+                                    record.setStatus(HSRecord.RECORD_UPLOAD_COMPLETE);
+                                    HSRecordsDaos.getInstance(context).addOneRecord(record);
+                                }
+                                notifyDataSetChanged();
                             }
                         }
 
                         @Override
                         public void onFailure() {
+                            reupload.setText("重传");
 
+                            if (records != null && records.size() > 0) {
+                                for (HSRecord record : records) {
+                                    record.setStatus(HSRecord.RECORD_NEED_REUPLOAD);
+                                    HSRecordsDaos.getInstance(context).addOneRecord(record);
+                                }
+                                notifyDataSetChanged();
+                            }
+                        }
+
+                        @Override
+                        public void onFileUploadSuccess(HSRecord record) {
+                            record.setStatus(HSRecord.RECORD_FILE_UPLOAD_COMPLETE);
+                            HSRecordsDaos.getInstance(context).addOneRecord(record);
+                            notifyDataSetChanged();
                         }
                     });
                 }
             });
+        }
+
+
+        TextView status_tv = (TextView) convertView.findViewById(R.id.status);
+        int status = record.getStatus();
+        switch (status) {
+            case HSRecord.RECORD_UPLOADING:
+                status_tv.setVisibility(View.VISIBLE);
+                status_tv.setText("正在上传记录...");
+                break;
+            case HSRecord.RECORD_UPLOAD_COMPLETE:
+                if (record.getDuration() <= 0) {
+                    status_tv.setVisibility(View.GONE);
+                } else {
+                    status_tv.setVisibility(View.VISIBLE);
+                    status_tv.setText("正在上传音频...");
+                }
+                break;
+            case HSRecord.RECORD_FILE_UPLOAD_COMPLETE:
+                status_tv.setVisibility(View.GONE);
+                break;
+            default:
+                status_tv.setVisibility(View.GONE);
         }
 
         final ImageView select = (ImageView) convertView.findViewById(R.id.select);

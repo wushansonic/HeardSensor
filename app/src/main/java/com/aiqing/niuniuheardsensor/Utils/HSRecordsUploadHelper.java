@@ -41,6 +41,8 @@ public class HSRecordsUploadHelper {
         while (hasRecord) {
             int type = cursor.getInt(cursor.getColumnIndex(CallLog.Calls.TYPE));
             long duration = cursor.getLong(cursor.getColumnIndex(CallLog.Calls.DURATION));
+            if (type == 3)
+                duration = 0;
             String number = cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER));
 
             SimpleDateFormat sfd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -48,8 +50,9 @@ public class HSRecordsUploadHelper {
             String time = sfd.format(date);
             hasRecord = cursor.moveToNext();
 
+
             if (records == null || records.size() <= 0) {
-                HSRecord record_tmp = new HSRecord(date, type, number, duration, "", false, "");
+                HSRecord record_tmp = new HSRecord(date, type, number, duration, "", false, "", HSRecord.RECORD_UPLOADING);
                 HSRecordsDaos.getInstance(context).addOneRecord(record_tmp);
                 records = HSRecordsDaos.getInstance(context).getAllRecords();
                 latestRecord = (records != null && records.size() > 0) ? records.get(0) : null;
@@ -58,10 +61,8 @@ public class HSRecordsUploadHelper {
                 if (date.after(latestRecord.getDate())) {
                     Log.i(TAG, "type:" + type + " duration:" + duration + " number:" + number + " time:" + time);
                     String filePath = "";
-//                    if (duration > 0 && type != 3) {
                     filePath = MyAudioRecorder.getAudioMp3Filename();
-//                    }
-                    HSRecord record = new HSRecord(date, type, number, duration, filePath, false, "-1");
+                    HSRecord record = new HSRecord(date, type, number, duration, filePath, false, "", HSRecord.RECORD_UPLOADING);
 
                     boolean haveSameDate = false;
                     for (HSRecord record1 : resultRecords) {
