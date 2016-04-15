@@ -39,13 +39,49 @@ public class MyAudioRecorder {
     }
 
     public void prepare() {
-        int bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
-                AudioFormat.ENCODING_PCM_16BIT);
-        mBuffer = new short[bufferSize];
-        mRecorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_CALL, SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
-                AudioFormat.ENCODING_PCM_16BIT, bufferSize);
+//        int bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
+//                AudioFormat.ENCODING_PCM_16BIT);
+//        mBuffer = new short[bufferSize];
+//        mRecorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_CALL, SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
+//                AudioFormat.ENCODING_PCM_16BIT, bufferSize);
+        mRecorder = findAudioRecord();
         mConveter = new Mp3Conveter();
+        mConveter.SAMPLE_RATE = rate_cur;
     }
+
+
+    private static int[] mSampleRates = new int[]{44100, 22050, 16000, 11025, 8000};
+
+    private static int rate_cur = 44100;
+
+    public AudioRecord findAudioRecord() {
+        for (int rate : mSampleRates) {
+            for (short audioFormat : new short[]{AudioFormat.ENCODING_PCM_8BIT, AudioFormat.ENCODING_PCM_16BIT}) {
+                for (short channelConfig : new short[]{AudioFormat.CHANNEL_IN_MONO, AudioFormat.CHANNEL_IN_STEREO}) {
+                    try {
+
+                        int bufferSize = AudioRecord.getMinBufferSize(rate, channelConfig, audioFormat);
+
+                        if (bufferSize != AudioRecord.ERROR_BAD_VALUE) {
+                            // check if we can instantiate and have a success
+
+
+                            mBuffer = new short[bufferSize];
+                            AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, rate, channelConfig, audioFormat, bufferSize);
+
+                            if (recorder.getState() == AudioRecord.STATE_INITIALIZED) {
+                                rate_cur = rate;
+                                return recorder;
+                            }
+                        }
+                    } catch (Exception e) {
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 
     /**
      * 开始录音
@@ -128,7 +164,7 @@ public class MyAudioRecorder {
         mRecorder.stop();
         mIsPause = false;
         mIsRecording = false;
-        mEncodedFile =new File(path + "/" + AUDIO_MP3_FILENAME);
+        mEncodedFile = new File(path + "/" + AUDIO_MP3_FILENAME);
         mConveter.encodeFile(mRawFile.getAbsolutePath(), mEncodedFile.getAbsolutePath());
     }
 
@@ -147,6 +183,6 @@ public class MyAudioRecorder {
 
 
     public static String getAudioMp3Filename() {
-        return path+ "/" +AUDIO_MP3_FILENAME;
+        return path + "/" + AUDIO_MP3_FILENAME;
     }
 }
