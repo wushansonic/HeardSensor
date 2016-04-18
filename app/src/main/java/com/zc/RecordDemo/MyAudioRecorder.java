@@ -23,20 +23,25 @@ public class MyAudioRecorder {
 
     public static final int SAMPLE_RATE = 44100;
 
-    private Mp3Conveter mConveter;
+    private static Mp3Conveter mConveter;
     private short[] mBuffer;
     private boolean mIsRecording = false;
     private File mRawFile;
     private File mEncodedFile;
 
     public static String AUDIO_MP3_FILENAME = "FinalAudio.mp3";
-    private final static String AUDIO_RAW_FILENAME = "RawAudio.raw";
+    private static String AUDIO_RAW_FILENAME = "RawAudio.raw";
+
+    private static String AUDIO_FILENAME_PREFIX = "";
 
     private static String path = "/sdcard/heardsensor";
 
-    public static void setFileName_mp3(String fileName) {
-        AUDIO_MP3_FILENAME = fileName;
+    public static void setFileName_prefix(String prefix) {
+        AUDIO_FILENAME_PREFIX = prefix;
+        AUDIO_MP3_FILENAME = AUDIO_FILENAME_PREFIX + ".mp3";
+        AUDIO_RAW_FILENAME = AUDIO_FILENAME_PREFIX + ".raw";
     }
+
 
     public void prepare() {
 //        int bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
@@ -164,8 +169,35 @@ public class MyAudioRecorder {
         mRecorder.stop();
         mIsPause = false;
         mIsRecording = false;
-        mEncodedFile = new File(path + "/" + AUDIO_MP3_FILENAME);
-        mConveter.encodeFile(mRawFile.getAbsolutePath(), mEncodedFile.getAbsolutePath());
+
+//        new Thread() {
+//            @Override
+//            public void run() {
+//                super.run();
+//                mEncodedFile = new File(path + "/" + AUDIO_FILENAME_PREFIX + "_tmp.mp3");
+//                mConveter.encodeFile(mRawFile.getAbsolutePath(), mEncodedFile.getAbsolutePath());
+//                mEncodedFile.renameTo(new File(path + "/" + AUDIO_MP3_FILENAME));
+//                mRawFile.delete();
+//            }
+//        }.start();
+
+    }
+
+
+    public static void encodeFile(String filePath) {
+
+        File rawFile = new File(filePath.replace(".mp3", ".raw"));
+
+        if(!rawFile.exists())
+            return;
+
+        File encodedFile = new File(filePath);
+        if (mConveter == null) {
+            mConveter = new Mp3Conveter();
+        }
+        mConveter.encodeFile(rawFile.getAbsolutePath(), encodedFile.getAbsolutePath());
+
+        rawFile.delete();
     }
 
 
@@ -184,5 +216,9 @@ public class MyAudioRecorder {
 
     public static String getAudioMp3Filename() {
         return path + "/" + AUDIO_MP3_FILENAME;
+    }
+
+    public boolean ismIsRecording() {
+        return mIsRecording;
     }
 }

@@ -7,6 +7,7 @@ import android.util.Log;
 import com.aiqing.niuniuheardsensor.Utils.HSQiniuUploadHelper;
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.zc.RecordDemo.MyAudioRecorder;
 
 import org.apache.http.Header;
 import org.json.JSONObject;
@@ -92,34 +93,51 @@ public class HSApiHelper {
                     callBack.onSuccess(response);
 
 
-                JSONObject data = response.optJSONObject("data");
+                final JSONObject data = response.optJSONObject("data");
 
                 if (data == null)
                     return;
 
-                for (String key : keys) {
-                    JSONObject fileObject = data.optJSONObject(key);
+                new Thread() {
+                    @Override
+                    public void run() {
+                        super.run();
+                        for (String key : keys) {
+                            JSONObject fileObject = data.optJSONObject(key);
 
-                    if (fileObject != null) {
-                        String token = fileObject.optString("token");
-                        String key_file = fileObject.optString("key");
-                        int id = fileObject.optInt("id");
-                        HSRecord record = keysMap.get(key);
-                        record.setReupload_id(String.valueOf(id));
-                        String filePath = null;
-                        if (record != null) {
-                            filePath = record.getFile_path();
-                        }
-                        if (!TextUtils.isEmpty(filePath)) {
-                            HSQiniuUploadHelper.upload(new File(filePath), key_file, token, new HSQiniuUploadHelper.Callback() {
-                                @Override
-                                public void onComplete(HSRecord record) {
-                                    callBack.onFileUploadSuccess(record);
+                            if (fileObject != null) {
+                                String token = fileObject.optString("token");
+                                String key_file = fileObject.optString("key");
+                                int id = fileObject.optInt("id");
+                                HSRecord record = keysMap.get(key);
+                                record.setReupload_id(String.valueOf(id));
+                                String filePath = null;
+                                if (record != null) {
+                                    filePath = record.getFile_path();
                                 }
-                            }, record);
+                                if (!TextUtils.isEmpty(filePath)) {
+
+                                    MyAudioRecorder.encodeFile(filePath);
+
+                                    File f = new File(filePath);
+
+                                    if (f.exists()) {
+                                        HSQiniuUploadHelper.upload(f, key_file, token, new HSQiniuUploadHelper.Callback() {
+                                            @Override
+                                            public void onComplete(HSRecord record) {
+                                                callBack.onFileUploadSuccess(record);
+                                            }
+                                        }, record);
+                                    }
+
+                                }
+                            }
                         }
+
+
                     }
-                }
+                }.start();
+
 
             }
 

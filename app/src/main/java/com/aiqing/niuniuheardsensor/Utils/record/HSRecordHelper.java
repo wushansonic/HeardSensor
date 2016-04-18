@@ -105,18 +105,22 @@ public class HSRecordHelper {
             recorder.prepare();
         }
 
+        if (recorder.ismIsRecording()) {
+            return;
+        }
+
 
         File pp = new File(path);
         if (!pp.isDirectory() && !pp.exists()) {
             pp.mkdir();
         }
 
-        String fileName_mp3 = new SimpleDateFormat(
-                "yyyyMMddHHmmss").format(System
-                .currentTimeMillis())
-                + ".mp3";
 
-        recorder.setFileName_mp3(fileName_mp3);
+        String prefix = new SimpleDateFormat(
+                "yyyyMMddHHmmss").format(System
+                .currentTimeMillis());
+
+        recorder.setFileName_prefix(prefix);
         recorder.startRecording();
     }
 
