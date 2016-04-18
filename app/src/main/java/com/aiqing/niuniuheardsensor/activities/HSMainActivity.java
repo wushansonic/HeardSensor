@@ -289,7 +289,6 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
 
                                 if (!TextUtils.isEmpty(filePath)) {
                                     HSQiniuUploadHelper.upload(new File(filePath), key_file, token, null, null);
-                                    //TODO 存储ID
                                 }
                             }
                         }
