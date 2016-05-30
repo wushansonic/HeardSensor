@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HeardSensor.iml" filepath="$PROJECT_DIR$/HeardSensor.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hslib/hslib.iml" filepath="$PROJECT_DIR$/hslib/hslib.iml" />
     </modules>
   </component>
 </project>

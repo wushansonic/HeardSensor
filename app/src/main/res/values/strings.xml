@@ -5,11 +5,11 @@
     <string name="action_settings">Settings</string>
 
 
-    <string name="API_HOST">@string/HS_HOST</string>
+    <string name="API_HOST">@string/HS_HOST_TEST</string>
     <string name="HS_HOST">http://www.niuniuqiche.com</string>
     <string name="HS_HOST_TEST">http://121.40.204.159</string>
 
-    <integer name="API_HTTP_PORT">@integer/HS_HTTP_PORT</integer>
+    <integer name="API_HTTP_PORT">@integer/HS_HTTP_PORT_TEST</integer>
     <integer name="HS_HTTP_PORT">80</integer>
     <integer name="HS_HTTP_PORT_TEST">8888</integer>
 </resources>
