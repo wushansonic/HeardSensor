@@ -30,6 +30,7 @@ import com.aiqing.niuniuheardsensor.Utils.record.HSRecordHelper;
 import com.aiqing.niuniuheardsensor.adapters.HSRecordsAdapter;
 import com.aiqing.niuniuheardsensor.services.HSService;
 import com.aiqing.niuniuheardsensor.widgets.SweetAlertDialog;
+import com.igexin.sdk.PushManager;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.apache.http.Header;
@@ -94,6 +95,9 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
 
         //TODO 删除
         // requestReleaseRecord(this);
+
+
+        PushManager.getInstance().initialize(this.getApplicationContext());
 
     }
 
