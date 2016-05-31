@@ -16,6 +16,7 @@ public class HSHttpClient {
     public static synchronized AsyncHttpClient instance() {
         if (sInstance == null) {
             sInstance = new AsyncHttpClient(API_HTTP_PORT);
+            sInstance.setTimeout(50 * 1000);
             sInstance.setUserAgent("");
         }
         return sInstance;
@@ -30,4 +31,7 @@ public class HSHttpClient {
     private static final int API_HTTP_PORT = HSApplication.getContext().getResources().getInteger(R.integer.API_HTTP_PORT);
 
     public static final String API_ISSUE_PHONES = API_HOST + "/api/" + V + "/issue_phones/create_issue_phone";
+
+    public static final String API_CONFIRM_AUDIO_UPLOADED = API_HOST + "/api/" + V + "/issue_phones/confirm_audio_uploaded";
+
 }

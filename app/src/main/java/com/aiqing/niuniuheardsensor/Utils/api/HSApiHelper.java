@@ -155,6 +155,39 @@ public class HSApiHelper {
     }
 
 
+    static public void requestConfirmUpload(final String key) {
+
+        HSRequestParams params = new HSRequestParams();
+
+        params.put("audio_key", key);
+
+        HSHttpClient.instance().get(HSHttpClient.API_CONFIRM_AUDIO_UPLOADED, params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                try {
+                    Log.i(TAG, "Confirm Upload success " + key + ":" + response.toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                try {
+                    Log.i(TAG, "Confirm Upload failure " + key + ":" + responseString);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+    }
+
+
     static public interface CallBack {
         public void onSuccess(JSONObject response);
 
