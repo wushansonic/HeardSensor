@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.provider.CallLog;
 import android.util.Log;
 
+import com.aiqing.niuniuheardsensor.HSApplication;
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
 import com.aiqing.niuniuheardsensor.Utils.db.dao.HSRecordsDaos;
 import com.zc.RecordDemo.MyAudioRecorder;
@@ -47,6 +48,18 @@ public class HSRecordsUploadHelper {
 
             SimpleDateFormat sfd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date date = new Date(Long.parseLong(cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.DATE))));
+            if (type == 1) {
+
+                long lastFileTime = HSApplication.asp.read(SPAppInner.LastFileRecordDATE, 0l);
+                if (lastFileTime > 0) {
+                    Date lastFileDate = new Date(lastFileTime);
+                    if (lastFileDate.before(date)) {
+                        duration = 0;
+                        type = 3;
+                    }
+                }
+            }
+
             String time = sfd.format(date);
             hasRecord = cursor.moveToNext();
 

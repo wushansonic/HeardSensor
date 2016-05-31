@@ -4,6 +4,8 @@ import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.util.Log;
 
+import com.aiqing.niuniuheardsensor.HSApplication;
+import com.aiqing.niuniuheardsensor.Utils.SPAppInner;
 import com.zc.RecordDemo.MyAudioRecorder;
 
 import java.io.File;
@@ -116,9 +118,15 @@ public class HSRecordHelper {
         }
 
 
+        long time = System.currentTimeMillis();
+
         String prefix = new SimpleDateFormat(
-                "yyyyMMddHHmmss").format(System
-                .currentTimeMillis());
+                "yyyyMMddHHmmss").format(time);
+//
+//        lastRecordDate = new Date(time);
+
+        HSApplication.asp.write(SPAppInner.LastFileRecordDATE, time);
+
 
         recorder.setFileName_prefix(prefix);
         recorder.startRecording();
