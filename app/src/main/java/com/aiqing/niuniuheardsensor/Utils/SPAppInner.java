@@ -9,8 +9,13 @@ public class SPAppInner extends AbstractSharedPreference {
 
     public static final String MOBILE = "mobile";
 
+    public static final String PERMISSIONDENEY = "permissionDeney";
+
+    public static final String LastFileRecordDATE = "LastFileRecordDATE";
+
 
     private static final String STORE_NAME = "hsqc_share_data";
+
     //不要手动进行new
     public SPAppInner(Context context) {
         super(context, STORE_NAME);

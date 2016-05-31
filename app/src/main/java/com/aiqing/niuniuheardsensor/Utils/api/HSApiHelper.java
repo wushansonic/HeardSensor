@@ -4,8 +4,11 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.aiqing.niuniuheardsensor.HSApplication;
 import com.aiqing.niuniuheardsensor.Utils.HSQiniuUploadHelper;
+import com.aiqing.niuniuheardsensor.Utils.SPAppInner;
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
+import com.aiqing.niuniuheardsensor.widgets.SweetAlertDialog;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.zc.RecordDemo.MyAudioRecorder;
 
@@ -28,6 +31,24 @@ public class HSApiHelper {
     public static String myMobile = "";
 
     static public void requestReleaseRecord(final List<HSRecord> records, Context context, final CallBack callBack) {
+        boolean permissionDeney = HSApplication.asp.read(SPAppInner.PERMISSIONDENEY, false);
+        if (permissionDeney) {
+            new SweetAlertDialog(context).showCancelButton(false).hideEdit(false).setTitleText("请打开录音权限,否则无法上传通话记录!").setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                @Override
+                public void onClick(SweetAlertDialog sweetAlertDialog) {
+                    sweetAlertDialog.dismiss();
+                }
+            }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                @Override
+                public void onClick(SweetAlertDialog sweetAlertDialog) {
+                    sweetAlertDialog.dismiss();
+                }
+            }).show();
+
+            return;
+        }
+
+
         if (records != null && records.size() <= 0)
             return;
 
@@ -148,6 +169,39 @@ public class HSApiHelper {
                 Log.i(TAG, responseString);
                 if (callBack != null)
                     callBack.onFailure();
+            }
+        });
+
+
+    }
+
+
+    static public void requestConfirmUpload(final String key) {
+
+        HSRequestParams params = new HSRequestParams();
+
+        params.put("audio_key", key);
+
+        HSHttpClient.instance().get(HSHttpClient.API_CONFIRM_AUDIO_UPLOADED, params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                try {
+                    Log.i(TAG, "Confirm Upload success " + key + ":" + response.toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                try {
+                    Log.i(TAG, "Confirm Upload failure " + key + ":" + responseString);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 

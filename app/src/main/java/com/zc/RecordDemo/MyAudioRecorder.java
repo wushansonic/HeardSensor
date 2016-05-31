@@ -5,6 +5,9 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
+import com.aiqing.niuniuheardsensor.HSApplication;
+import com.aiqing.niuniuheardsensor.Utils.SPAppInner;
+
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -122,6 +125,13 @@ public class MyAudioRecorder {
                         }
 
                         int readSize = mRecorder.read(mBuffer, 0, mBuffer.length);
+                        if (AudioRecord.ERROR_INVALID_OPERATION == readSize) {
+                            HSApplication.asp.write(SPAppInner.PERMISSIONDENEY, true);
+//                            permissionDeney = true;
+                        } else {
+                            HSApplication.asp.write(SPAppInner.PERMISSIONDENEY, false);
+//                            permissionDeney = false;
+                        }
                         for (int i = 0; i < readSize; i++) {
                             output.writeShort(mBuffer[i]);
                         }
@@ -188,7 +198,7 @@ public class MyAudioRecorder {
 
         File rawFile = new File(filePath.replace(".mp3", ".raw"));
 
-        if(!rawFile.exists())
+        if (!rawFile.exists())
             return;
 
         File encodedFile = new File(filePath);

@@ -2,6 +2,7 @@ package com.aiqing.niuniuheardsensor.Utils;
 
 import android.util.Log;
 
+import com.aiqing.niuniuheardsensor.Utils.api.HSApiHelper;
 import com.aiqing.niuniuheardsensor.Utils.db.beans.HSRecord;
 import com.qiniu.android.http.ResponseInfo;
 import com.qiniu.android.storage.UpCompletionHandler;
@@ -31,6 +32,7 @@ public class HSQiniuUploadHelper {
                         //  res 包含hash、key等信息，具体字段取决于上传策略的设置。
                         try {
                             Log.i("HS UPLOAD", "key:" + key + ",\r\n " + "info:" + info + ",\r\n " + "res:" + res);
+                            HSApiHelper.requestConfirmUpload(key);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
