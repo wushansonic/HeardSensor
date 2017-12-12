@@ -486,23 +486,26 @@ public class HSMainActivity extends HSBaseActivity implements View.OnClickListen
     }
 
     private void startCheckThread() {
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
 
 
-                while (goOn) {
-                    handler.sendEmptyMessage(1);
-
-                    try {
-                        Thread.sleep(1000 * 5);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }.start();
+        checkAndUploadRecords();
+//        new Thread() {
+//            @Override
+//            public void run() {
+//                super.run();
+//
+//
+//                while (goOn) {
+//                    handler.sendEmptyMessage(1);
+//
+//                    try {
+//                        Thread.sleep(1000 * 5);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        }.start();
     }
 
     @Override

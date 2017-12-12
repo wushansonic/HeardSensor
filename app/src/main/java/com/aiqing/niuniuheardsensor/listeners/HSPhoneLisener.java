@@ -45,7 +45,7 @@ public class HSPhoneLisener extends PhoneStateListener {
                     time = 0;
                     List<HSRecord> records = null;
                     if (needCheck) {
-                        records = HSRecordsUploadHelper.checkNeedUpload(context);
+//                        records = HSRecordsUploadHelper.checkNeedUpload(context);
                     }
 
                     if (callBack != null) {

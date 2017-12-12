@@ -160,18 +160,21 @@ public class MyAudioRecorder {
 
     public static void encodeFile(String filePath) {
 
-        File rawFile = new File(filePath.replace(".mp3", ".raw"));
+        File sourceFile=new File(filePath);
 
-        if (!rawFile.exists())
+
+        if (!sourceFile.exists())
             return;
 
-        File encodedFile = new File(filePath);
+        String tagetFilePath = filePath.replace(".amr", ".mp3");
+
+
         if (mConveter == null) {
             mConveter = new Mp3Conveter();
         }
-        mConveter.encodeFile(rawFile.getAbsolutePath(), encodedFile.getAbsolutePath());
+        mConveter.encodeFile(sourceFile.getPath(), tagetFilePath);
 
-        rawFile.delete();
+//        rawFile.delete();
     }
 
 

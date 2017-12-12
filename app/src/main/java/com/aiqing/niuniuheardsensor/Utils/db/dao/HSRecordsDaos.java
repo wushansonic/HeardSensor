@@ -89,12 +89,23 @@ public class HSRecordsDaos extends OrmLiteSqliteOpenHelper {
     public List<HSRecord> getAllRecords() {
         List<HSRecord> records = null;
         try {
-            records = getRecordsDao().queryForAll();
+            records = getRecordsDao().queryBuilder().orderBy("date", true).query();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return records;
+    }
+
+    public HSRecord getLatestRecord() {
+        HSRecord record = null;
+        try {
+            List<HSRecord> records = getRecordsDao().queryBuilder().orderBy("date", false).query();
+            record = records.get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return record;
     }
 
     public void addOneRecord(HSRecord record) {
