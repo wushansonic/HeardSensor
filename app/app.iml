@@ -104,7 +104,5 @@
     <orderEntry type="library" exported="" name="multidex-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="android-async-http-1.4.7" level="project" />
     <orderEntry type="module" module-name="hslib" exported="" />
-    <orderEntry type="library" exported="" name="GetuiExt-2.0.3" level="project" />
-    <orderEntry type="library" exported="" name="GetuiSDK2.8.1.0" level="project" />
   </component>
 </module>

@@ -143,18 +143,6 @@ public class MyAudioRecorder {
         mRecorder.stop();
         mIsPause = false;
         mIsRecording = false;
-
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                mEncodedFile = new File(path + "/" + AUDIO_FILENAME_PREFIX + "_tmp.mp3");
-                mConveter.encodeFile(mRawFile.getAbsolutePath(), mEncodedFile.getAbsolutePath());
-                mEncodedFile.renameTo(new File(path + "/" + AUDIO_MP3_FILENAME));
-                mRawFile.delete();
-            }
-        }.start();
-
     }
 
 
